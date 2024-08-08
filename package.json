@@ -1,0 +1,43 @@
+{
+  "name": "inform-ai",
+  "version": "0.0.1",
+  "description": "A collection of hooks and utilities to easily add contextual AI to React applications",
+  "main": "dist/index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "build": "tsc && rollup -c",
+    "build:watch": "concurrently \"tsc --watch\" \"rollup -c --watch\""
+  },
+  "keywords": [
+    "ai",
+    "react"
+  ],
+  "author": "Ed Spencer",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc",
+    "@types/uuid": "^10.0.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "rollup": "^4.20.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^0.0.44",
+    "ai": "^3.3.4",
+    "clsx": "^2.1.1",
+    "react": "19.0.0-rc-cc1ec60d0d-20240607",
+    "react-dom": "19.0.0-rc-cc1ec60d0d-20240607",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  }
+}
