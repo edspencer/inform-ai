@@ -8,7 +8,9 @@
   },
   "scripts": {
     "build": "tsc && rollup -c",
-    "build:watch": "concurrently \"tsc --watch\" \"rollup -c --watch\""
+    "build:watch": "concurrently \"tsc --watch\" \"rollup -c --watch\"",
+    "ci:version": "changeset version",
+    "ci:publish": "tsc && rollup -c && changeset publish"
   },
   "keywords": [
     "ai",
