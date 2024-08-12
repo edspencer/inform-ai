@@ -65,9 +65,6 @@ yarn.lock
 # TypeScript build artifacts
 *.tsbuildinfo
 
-# Changesets
-.changeset/
-
 # Documentation artifacts
 docs/
 

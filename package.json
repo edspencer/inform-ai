@@ -17,6 +17,7 @@
   "author": "Ed Spencer",
   "license": "ISC",
   "devDependencies": {
+    "@changesets/cli": "^2.27.7",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@types/react": "npm:types-react@rc",
