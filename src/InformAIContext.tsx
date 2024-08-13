@@ -43,8 +43,6 @@ interface InformAIProviderProps {
  * The internal implementation of the InformAIProvider component.
  */
 export const InternalInformAIProvider = ({ children, onEvent }: InformAIProviderProps) => {
-  console.log("InformAIProvider");
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversation, setConversation] = useState<Conversation>({
     id: uuidv4(),

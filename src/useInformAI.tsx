@@ -7,6 +7,7 @@ import { useInformAIContext } from "./InformAIContext";
 import { StateMessage, EventMessage, Message, ComponentState, ComponentEvent, OptionalComponentEvent } from "./types";
 
 export interface UseInformAIHook {
+  componentId: string;
   addMessage: (message: Message) => void;
   addEvent: (event: OptionalComponentEvent) => void;
   addEventMessage: (event: EventMessage) => void;
@@ -18,6 +19,7 @@ export interface UseInformAIHook {
 export function useInformAI(componentData: ComponentState): UseInformAIHook {
   const context = useInformAIContext();
   const componentIdRef = useRef<string>(componentData.componentId || uuidv4());
+  const componentId = componentIdRef.current;
 
   // console.log("useInformAI", componentIdRef.current);
 
@@ -26,15 +28,19 @@ export function useInformAI(componentData: ComponentState): UseInformAIHook {
 
   useEffect(() => {
     console.log("Adding a state message", componentIdRef.current);
-    context.addState({
-      componentId: componentIdRef.current,
-      prompt: stableComponentData.prompt,
-      props: stableComponentData.props,
-      name: stableComponentData.name,
-    });
-  }, [componentIdRef.current, stableComponentData]);
+
+    if (!componentData.noState) {
+      context.addState({
+        componentId: componentIdRef.current,
+        prompt: stableComponentData.prompt,
+        props: stableComponentData.props,
+        name: stableComponentData.name,
+      });
+    }
+  }, [componentId, stableComponentData]);
 
   return {
+    componentId,
     addMessage: (message: Message) => {
       return context.addMessage(message);
     },

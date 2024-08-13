@@ -11,6 +11,7 @@ export type ComponentState = {
   props?: {
     [key: string]: any;
   };
+  noState?: boolean;
 };
 
 export type ComponentEvent = {
