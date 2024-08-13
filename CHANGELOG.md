@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.1.0
+
+### Minor Changes
+
+- 53e9a35: Add noState option, return assigned componentId
+
 ## 0.0.4
 
 ### Patch Changes
