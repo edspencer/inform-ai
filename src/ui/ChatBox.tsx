@@ -17,9 +17,9 @@ export function ChatBox({ onSubmit }: { onSubmit: (message: string) => Promise<b
           e.target["message"].value = "";
         }
       }}
-      className="sm:flex flex-1"
+      className="flex gap-2"
     >
-      <div className="w-full">
+      <div className="flex-1">
         <label htmlFor="message" className="sr-only">
           Message
         </label>
@@ -35,7 +35,7 @@ export function ChatBox({ onSubmit }: { onSubmit: (message: string) => Promise<b
       </div>
       <button
         type="submit"
-        className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:ml-3 sm:mt-0 sm:w-auto"
+        className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
       >
         Send
       </button>

@@ -14,16 +14,18 @@ export function CurrentState({ className }: { className?: string }) {
   const unsentMessages = messages.filter((message) => message.createdAt >= lastSentAt);
 
   return (
-    <div className={clsx("border border-red-500 flex flex-col gap-2 rounded-lg bg-background w-96 p-2", className)}>
+    <div
+      className={clsx("border border-gray-300 flex flex-col gap-2 rounded-lg bg-background min-w-96 p-2", className)}
+    >
       <h1 className="text-lg font-semibold">Current InformAI State</h1>
 
       <div className="overflow-auto">
         {sentMessages.map((message, index) => (
-          <Message key={index} message={message} />
+          <Row key={index} message={message} />
         ))}
         <LastSentDivider />
         {unsentMessages.map((message, index) => (
-          <Message key={index} message={message} />
+          <Row key={index} message={message} />
         ))}
       </div>
     </div>
@@ -70,7 +72,7 @@ export function ComponentName({ message }: { message: Message }) {
   return <p className="flex-1 font-bold">{name}</p>;
 }
 
-export function Message({ message }: { message: Message }) {
+export function Row({ message }: { message: Message }) {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpanded = () => {
