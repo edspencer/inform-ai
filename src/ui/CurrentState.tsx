@@ -41,7 +41,7 @@ export function LastSentDivider() {
     <div className="flex justify-center items-center">
       <div className="h-0.5 w-1/2 bg-gray-300"></div>
       <p className="mx-2 text-sm text-gray-500">
-        Last Sent: {lastSentAt.getHours()}:{lastSentAt.getMinutes()}
+        Last Sent: {lastSentAt.getHours()}:{lastSentAt.getMinutes().toString().padStart(2, "0")}
       </p>
       <div className="h-0.5 w-1/2 bg-gray-300"></div>
     </div>
