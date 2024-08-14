@@ -36,7 +36,7 @@ const InformAIContext = createContext<InformAIContextType | undefined>(undefined
  */
 interface InformAIProviderProps {
   children: ReactNode;
-  onEvent: (event: any) => void;
+  onEvent?: (event: any) => void;
 }
 
 /**
@@ -147,7 +147,6 @@ export const InternalInformAIProvider = ({ children, onEvent }: InformAIProvider
    * @param state The state message to add.
    */
   function addStateMessage(state: StateMessage) {
-    console.log("addStateMessage Internal", state);
     addMessage(state);
   }
 
@@ -156,10 +155,11 @@ export const InternalInformAIProvider = ({ children, onEvent }: InformAIProvider
    * @param event The event message to add.
    */
   function addEventMessage(event: EventMessage) {
-    console.log("addEventMessage Internal", event);
-
     addMessage(event);
-    onEvent(event);
+
+    if (onEvent) {
+      onEvent(event);
+    }
   }
 
   /**
