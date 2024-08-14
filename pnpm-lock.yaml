@@ -23,6 +23,9 @@ importers:
       react-dom:
         specifier: 19.0.0-rc-cc1ec60d0d-20240607
         version: 19.0.0-rc-cc1ec60d0d-20240607(react@19.0.0-rc-cc1ec60d0d-20240607)
+      react18-json-view:
+        specifier: ^0.2.8
+        version: 0.2.8(react@19.0.0-rc-cc1ec60d0d-20240607)
       rollup-plugin-postcss:
         specifier: ^4.0.2
         version: 4.0.2(postcss@8.4.41)
@@ -1997,6 +2000,11 @@ packages:
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
+
+  react18-json-view@0.2.8:
+    resolution: {integrity: sha512-uJlcf5PEDaba6yTqfcDAcMSYECZ15SLcpP94mLFTa/+fa1kZANjERqKzS7YxxsrGP4+jDxt6sIaglR0PbQcKPw==}
+    peerDependencies:
+      react: '>=16.8.0'
 
   react@19.0.0-rc-cc1ec60d0d-20240607:
     resolution: {integrity: sha512-q8A0/IdJ2wdHsjDNO1igFcSSFIMqSKmO7oJZtAjxIA9g0klK45Lxt15NQJ7z7cBvgD1r3xRTtQ/MAqnmwYHs1Q==}
@@ -4591,6 +4599,10 @@ snapshots:
       scheduler: 0.25.0-rc-cc1ec60d0d-20240607
 
   react-is@16.13.1: {}
+
+  react18-json-view@0.2.8(react@19.0.0-rc-cc1ec60d0d-20240607):
+    dependencies:
+      react: 19.0.0-rc-cc1ec60d0d-20240607
 
   react@19.0.0-rc-cc1ec60d0d-20240607: {}
 

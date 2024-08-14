@@ -29,6 +29,10 @@ export default [
     ],
     external: ["react", "react-dom"],
     plugins: [
+      postcss({
+        extract: true,
+        minimize: true,
+      }),
       peerDepsExternal(), // Automatically externalize peer dependencies
       resolve(), // Resolve modules from node_modules
       commonjs(), // Convert CommonJS modules to ES6

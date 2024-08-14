@@ -43,6 +43,7 @@
     "clsx": "^2.1.1",
     "react": "19.0.0-rc-cc1ec60d0d-20240607",
     "react-dom": "19.0.0-rc-cc1ec60d0d-20240607",
+    "react18-json-view": "^0.2.8",
     "rollup-plugin-postcss": "^4.0.2",
     "uuid": "^10.0.0",
     "zod": "^3.23.8"

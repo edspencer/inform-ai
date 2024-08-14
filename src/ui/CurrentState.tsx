@@ -4,6 +4,9 @@ import clsx from "clsx";
 import type { Message, StateMessage } from "../types";
 import { useState } from "react";
 
+import JsonView from "react18-json-view";
+import "react18-json-view/src/style.css";
+
 export function CurrentState({ className }: { className?: string }) {
   const {
     messages,
@@ -69,7 +72,7 @@ export function MessageTypePill({ message }: { message: Message }) {
 export function ComponentName({ message }: { message: Message }) {
   const name = message.type === "state" ? message.content.name : message.content.type;
 
-  return <p className="flex-1 font-bold">{name}</p>;
+  return <p className="flex-1 font-bold pl-1">{name}</p>;
 }
 
 export function Row({ message }: { message: Message }) {
@@ -80,7 +83,7 @@ export function Row({ message }: { message: Message }) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-1">
       <div className="flex items-center">
         <button onClick={toggleExpanded}>{expanded ? <span>-</span> : <span>+</span>}</button>
         <ComponentName message={message} />
@@ -91,7 +94,9 @@ export function Row({ message }: { message: Message }) {
       </div>
       {expanded && (
         <div className="ml-4">
-          <pre className="overflow-x-auto">{JSON.stringify(message.content, null, 2)}</pre>
+          <pre className="overflow-x-auto">
+            <JsonView src={message.content} />
+          </pre>
         </div>
       )}
     </div>
