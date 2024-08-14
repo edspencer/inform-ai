@@ -1,5 +1,16 @@
 # inform-ai
 
+## 0.2.0
+
+### Minor Changes
+
+- d0c9d64: Added the InformAI component
+
+### Patch Changes
+
+- a749126: Add better JSON view
+- 7dcb831: Fix leading zero on last sent in CurrentState
+
 ## 0.1.0
 
 ### Minor Changes
