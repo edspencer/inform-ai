@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.2.1
+
+### Patch Changes
+
+- 4e5de0f: Docs, make createInformAI have optional argument
+
 ## 0.2.0
 
 ### Minor Changes
