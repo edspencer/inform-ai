@@ -177,3 +177,67 @@ export default function RootLayout({
   );
 }
 ```
+
+The easiest way to now give the AI the context already stored inside your components is to use the `<InformAI />` component.
+
+Let's say you have a page that shows information about a Schedule. We can add inform-ai support in 3 lines of code:
+
+```tsx
+//load the InformAI component
+import { InformAI } from "inform-ai";
+```
+
+```tsx
+//provide a meaningful prompt string that tells the LLM exactly what this LLM is showing
+//this could be a dynamically-generated string, does not have to be static like this
+const prompt = `A page that shows the details of a schedule. It should show the schedule's configuration, the devices in the schedule, and recent jobs for the schedule. It should also have buttons to run the schedule, edit the schedule, and delete the schedule.`;
+```
+
+```tsx
+//pass the component name, prompt and any props you like to the InformAI component
+<InformAI name="Schedule Detail Page" prompt={prompt} props={{ schedule, devices, jobs }} />
+```
+
+The `<InformAI />` component does not render anything, but behind the scenes it calls `useInformAI` with the `name`, `prompt` and `props` you gave it, which in turn passes that information along to inform-ai.
+
+Here's the whole file:
+
+```tsx
+import { InformAI } from "inform-ai";
+
+const prompt = `A page that shows the details of a schedule. It should show the schedule's configuration, the devices in the schedule, and recent jobs for the schedule. It should also have buttons to run the schedule, edit the schedule, and delete the schedule.`;
+
+export default async function SchedulePage({ params: { id } }: { params: { id: string } }) {
+  const schedule = await getSchedule(parseInt(id, 10));
+
+  if (!schedule) {
+    return notFound();
+  }
+
+  const devices = await getScheduleDevices(schedule.id);
+  const jobs = await recentJobs(schedule.id);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <InformAI name="Schedule Detail Page" prompt={prompt} props={{ schedule, devices, jobs }} />
+      <div className="flex w-full flex-wrap items-end justify-between">
+        <Heading>Schedule Details</Heading>
+        <div className="flex gap-4">
+          <RunScheduleForm schedule={schedule} />
+
+          <Button href={`/schedules/${schedule.id}/edit`}>Edit</Button>
+          <DeleteScheduleButton schedule={schedule} />
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row gap-8">
+        <ScheduleConfiguration schedule={schedule} />
+        <DevicesList devices={devices} />
+      </div>
+      <Subheading className="mt-8 mb-2">Recent Jobs</Subheading>
+      <NoContentYet items={jobs} message="No recent jobs" />
+      {jobs.length ? <JobsTable jobs={jobs} /> : null}
+      {/* <RecentBackups deviceId={schedule.id} /> */}
+    </div>
+  );
+}
+```
