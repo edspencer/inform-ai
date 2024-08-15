@@ -1,16 +1,25 @@
 "use client";
 
+import clsx from "clsx";
 import { useStreamableContent } from "../useStreamableContent";
 
 export type Role = "assistant" | "user" | "system";
 
-export function Messages({ messages, showRoles = ["user", "assistant"] }: { messages: any[]; showRoles?: Role[] }) {
+export function Messages({
+  messages,
+  showRoles = ["user", "assistant"],
+  className = "",
+}: {
+  messages: any[];
+  showRoles?: Role[];
+  className?: string;
+}) {
   if (!messages || messages.length === 0) {
     return null;
   }
 
   return (
-    <div className="iai-messages">
+    <div className={clsx("iai-messages", className)}>
       {messages
         .filter((message) => showRoles.includes(message.role))
         .map((message, index) => (
