@@ -67,7 +67,6 @@ export const InternalInformAIProvider = ({ children, onEvent }: InformAIProvider
    * @param message The message to add.
    */
   function addMessage(message: Message) {
-    console.log("addMessage Internal", message);
     setMessages((prevMessages) => [...prevMessages, message]);
   }
 
@@ -76,8 +75,6 @@ export const InternalInformAIProvider = ({ children, onEvent }: InformAIProvider
    * @param state The state message to add.
    */
   function addState(state: ComponentState) {
-    console.log("addState Internal", state);
-
     addMessage({
       id: uuidv4(),
       createdAt: new Date(),
@@ -132,8 +129,6 @@ export const InternalInformAIProvider = ({ children, onEvent }: InformAIProvider
    * @param event The event message to add.
    */
   function addEvent(event: ComponentEvent) {
-    console.log("addEvent Internal", event);
-
     addMessage({
       id: uuidv4(),
       createdAt: new Date(),
