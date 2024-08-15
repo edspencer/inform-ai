@@ -24,15 +24,17 @@ export function CurrentState({ className }: { className?: string }) {
         Current InformAI State <span className="toggle">{collapsed ? ">" : "v"}</span>
       </h1>
 
-      <div className={`rows ${collapsed ? "collapsed" : ""}`}>
-        {sentMessages.map((message, index) => (
-          <Row key={index} message={message} />
-        ))}
-        <LastSentDivider />
-        {unsentMessages.map((message, index) => (
-          <Row key={index} message={message} />
-        ))}
-      </div>
+      {collapsed ? null : (
+        <div className={`rows ${collapsed ? "collapsed" : ""}`}>
+          {sentMessages.map((message, index) => (
+            <Row key={index} message={message} />
+          ))}
+          <LastSentDivider />
+          {unsentMessages.map((message, index) => (
+            <Row key={index} message={message} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
