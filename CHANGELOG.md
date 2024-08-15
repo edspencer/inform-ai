@@ -1,5 +1,12 @@
 # inform-ai
 
+## 0.2.3
+
+### Patch Changes
+
+- 0f987fb: Allow Messages to accept a className
+- 324abd8: Better-looking collapsed state for CurrentState
+
 ## 0.2.2
 
 ### Patch Changes
