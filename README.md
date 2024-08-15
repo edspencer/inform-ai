@@ -292,15 +292,14 @@ Inside a file like `actions/AI.tsx`, we can define a `submitUserMessage` functio
 ```tsx
 "use server";
 
-import { getMutableAIState } from "ai/rsc";
+import { getMutableAIState, streamUI } from "ai/rsc";
 import { openai } from "@ai-sdk/openai";
-import { streamMulti } from "ai-stream-multi";
 import { Spinner } from "@/components/common/spinner";
 
 import { AssistantMessage } from "inform-ai";
 import { generateId } from "ai";
 
-import { ClientMessage } from "../providers/AI";
+import { AIState, ClientMessage } from "../providers/AI";
 
 import RedirectTool from "../tools/Redirect";
 import BackupsTableTool from "../tools/BackupsTable";
@@ -314,33 +313,14 @@ export async function submitUserMessage(messages: ClientMessage[]) {
     messages: [...aiState.get().messages, ...messages],
   });
 
-  //set up our streaming LLM response, with the messages, a couple of tools, and a system prompt
-  const result = await streamMulti({
+  //set up our streaming LLM response, with a couple of tools, a prompt and some onSegment logic
+  //to add any tools and text responses from the LLM to the AI State
+  const result = await streamUI({
     model: openai("gpt-4o-2024-08-06"),
     initial: <Spinner />,
     system: `\
-    You are a helpful assistant who can help a user to navigate through information they
-    are seeing on their screen. The user interface that that user is looking at has a collection
-    of components that can send events and have states. The user can interact with the components,
-    and the components can send events to the assistant. Messages sent from components will usually
-    have a unique componentId, may have a human-friendly name, may also have a self-description that
-    is intended to help you understand what the component does.
-
-    This application is called LANsaver, and is a tool that helps users back up the configurations
-    of network devices such as routers, firewalls, switches and Home Assistant instances. It has the
-    following features:
-
-    - CRUD operations for Devices - user can specify the hostname, type and credentials for the device
-    - Backup operations - user can back up the configuration of a Device. The Backup is stored as a file,
-      and has logs that the user can view
-    - Schedule operations - user CRUD Schedules, which apply to a subset of devices and run on a cron schedule
-    - Job operations - user can see the status of a job, and see the logs of a job. A Job is a collection of 
-      Backup operations, and is associated with a Schedule.
-    
-    Components can also send events, which are messages that describe something that happened in the
-    interface, like the user clicking something, or some other event.
-    
-    All messages from components will be sent via the system role in this conversation.`,
+    You are a helpful assistant who can blah blah blah - 
+    give your LLM detailed instructions about your app here`,
     messages: [
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
@@ -348,9 +328,19 @@ export async function submitUserMessage(messages: ClientMessage[]) {
         name: message.name,
       })),
     ],
-    textComponent: AssistantMessage,
-    onFinish: () => {
-      aiState.done(aiState.get());
+    text: ({ content, done }) => {
+      if (done) {
+        //store the LLM's response into AIState
+        aiState.update({
+          ...aiState.get(),
+          messages: [...aiState.get().messages, { role: "assistant", content }],
+        });
+
+        // console.log(aiState.get().messages); //if you want to see the message history
+        aiState.done(aiState.get());
+      }
+
+      return <AssistantMessage content={content} />;
     },
     tools: {
       redirect: RedirectTool,
@@ -360,16 +350,95 @@ export async function submitUserMessage(messages: ClientMessage[]) {
 
   return {
     id: generateId(),
-    content: result.ui.value,
+    content: result.value,
   };
 }
 ```
 
-Most of this was the system prompt that explains to the LLM what is expected of it. Much of the rest was setting up and updating the Vercel AI aiState so that the LLM can see all of the messages.
+Here we're using the Vercel AI SDK's `streamUI` function, which allows us to easily send back streaming text like a basic chatbot, but also streaming UI in the shape of our React Server Components.
 
 All of the inform-ai messages along with whatever the user wants to ask for will be passed in via the `messages` argument to this function. We'll see how that happens in the final section below.
 
-This particular example uses a custom function called [streamMulti()](https://github.com/edspencer/stream-multi), which is just a thin wrapper around the Vercel AI SDK's `streamText` function. This is currently being used here because the Vercel AI SDK's `streamText` and `streamUI` functions only support either a text response or a tool response, but not both, whereas this application wants to be able to show both streaming LLM text responses and streaming UI components rendered by tools. Your application doesn't have to use `streamMulti` - it can use any of the Vercel AI SDK functions instead.
+#### Streaming UI using Tools
+
+In the code snippet above we defined 2 tools that the LLM can execute if it thinks it makes sense to do so. If the tool has a `generate` function, it can render arbitrary React components that will be streamed to the browser.
+
+Here's a real-world example of a tool definition used in the [LANsaver](https://github.com/edspencer/lansaver) project ([see the full tool source](https://github.com/edspencer/lansaver/blob/main/app/tools/BackupsTable.tsx)). Most of this file is just textual description telling the LLM what the tool is and how to use it.
+
+The important part of the tool is the `generate` function. Note that this is all just vanilla Vercel AI SDK functionality, and you can read more about it [in their docs](https://sdk.vercel.ai/examples/next-app/interface/route-components). Basically, though, this function `yield`s a Spinner component while it is loading the data for the real component it will show, then does some basic fuzzy searching, then finally returns the `<BackupsTable>` component, which will be streamed to the UI:
+
+```tsx
+import { z } from "zod";
+import { BackupsTable } from "@/components/backup/table";
+import { getDeviceBackups, getDeviceByHostname } from "@/models/device";
+import { getPaginatedBackups } from "@/models/backup";
+import { Spinner } from "@/components/common/spinner";
+
+type BackupsTableToolParameters = {
+  condensed?: boolean;
+  showDevice?: boolean;
+  deviceId?: number;
+  deviceName?: string;
+  perPage?: number;
+  name?: string;
+};
+
+const BackupsTableTool = {
+  //tells the LLM what this tool is and when to use it
+  description:
+    "Renders a table of backups. Optionally, you can show the device column and condense the table. If the user requests to see all backups, do not pass in a deviceId.",
+
+  //tells the LLM how to invoke the tool, what the arguments are and which are optional
+  parameters: z.object({
+    condensed: z
+      .boolean()
+      .optional()
+      .describe("Set to true to condense the table and hide some of the extraneous columns"),
+    showDevice: z.boolean().optional().describe("Set to true to show the device column"),
+    deviceId: z
+      .number()
+      .optional()
+      .describe("The ID of the device to show backups for (do not set to show all backups)"),
+    deviceName: z
+      .string()
+      .optional()
+      .describe(
+        "The name of the device to show backups for. Pass this if the user asks for backups for a device by name. The tool will perform a fuzzy search for this device"
+      ),
+    perPage: z.number().optional().describe("The number of backups to show per page (defaults to 5)"),
+    name: z.string().optional().describe("A name to give to this table. For example, 'Recent Backups for Device X'"),
+  }),
+
+  //if the LLM decides to call this tool, generate will be called with the arguments the LLM decided to use
+  //this function can yield a temporary piece of UI, like a spinner, and then return the permanent UI when ready
+  generate: async function* (config: BackupsTableToolParameters) {
+    const { condensed, showDevice, deviceId, deviceName, perPage = 5, name } = config;
+
+    let backups;
+
+    yield <Spinner />;
+
+    if (deviceName) {
+      // Perform a fuzzy search for the device
+      const device = await getDeviceByHostname(deviceName);
+
+      if (device) {
+        backups = await getDeviceBackups(device.id, { take: perPage });
+      }
+    } else if (deviceId) {
+      backups = await getDeviceBackups(deviceId, { take: perPage });
+    }
+
+    if (!backups) {
+      backups = (await getPaginatedBackups({ includeDevice: true, page: 1, perPage })).backups;
+    }
+
+    return <BackupsTable name={name} backups={backups} condensed={condensed} showDevice={showDevice} />;
+  },
+};
+
+export default BackupsTableTool;
+```
 
 ### Sending message from the UI to the LLM
 
@@ -472,3 +541,89 @@ export default function RootLayout({
 ```
 
 And you're done. You should now see the `<CurrentState>` component rendering at the top right of the screen, showing all of the `state` and `event` messages your components have exposed to inform-ai, and a simple chat box with message history at the bottom right. When you next send a message to the LLM via the chat input, all of the inform-ai messages that have not previously been sent will be, along with your message, giving the LLM all the context you gave it to answer your question.
+
+### What the LLM sees
+
+Here's an example of a quick conversation with the LLM after just integrating inform-ai into the `SchedulePage` component that we showed above. `SchedulePage` is just a Next JS page (therefore a React component) that shows some simple details about a backup schedule for devices on a network:
+
+![Example Chat on Schedules page](/docs/inform-ai-chat-example.png)
+
+By just adding the `<InformAI />` tag to our `SchedulePage`, we were able to have this conversation with the LLM about its contents, without having to do any other integration. But because we also defined our `FirewallsTableTool` tool, the LLM knew how to stream our `<BackupsTable>` component back instead of a text response.
+
+Because `<BackupsTable>` also uses inform-ai, via the `useInformAI` hook, the LLM also sees all of the information in the React component that it just streamed back, so it was able to answer questions about that too ("did all of those complete successfully?").
+
+As our project was using the bundled `<CurrentState>` component while we had this conversation, we could easily see what the state sent to the LLM looks like directly in our UI:
+
+![CurrentState after this exchange](/docs/current-state-example.png)
+
+Here you can see that 4 `state` messages were published to inform-ai - the first 2 were for the `SchedulePage` (which has name=`Schedule Detail Page`), and 2 for the freshly-streamed `<BackupsTable>` that the LLM sent back. Expanding the last message there, we can see that the LLM gave the streamed component a sensible name based on the user's request, and also has the `prompt` and `props` that we supply it in `<BackupsTable>`.
+
+The 'Last Sent' message at the bottom tells us that all of the messages above were already sent to the LLM, as they were popped off the stack using `popRecentMessages` in our `<ChatWrapper>` component. `ChatWrapper` also did some deduping and conversion of the messages into an LLM-friendly format (see the [Sending Messages to the LLM](#sending-message-from-the-ui-to-the-llm) section), so now if we modify our `actions/AI.tsx` file and `console.log(aiState.get().messages)` we will see this:
+
+```
+[
+  {
+    id: '492b4wc',
+    content: 'Component adc51d8c-8ada-464a-a924-3f2ddb604b16 has updated its state\n' +
+      'Component Name: Schedule Detail Page\n' +
+      "Component self-description: A page that shows the details of a schedule. It should show the schedule's configuration, the devices in the schedule, and recent jobs for the schedule. It should also have buttons to run the schedule, edit the schedule, and delete the schedule.\n" +
+      'Component props: {"schedule":{"id":6,"disabled":false,"cron":"0 0 * * *","name":"Daily","devices":"21,19,83","createdAt":"2024-06-14T19:55:29.825Z","updatedAt":"2024-08-13T21:17:43.936Z"},"devices":[{"id":21,"type":"tplink","hostname":"masterclosetswitch.local","credentials":"fdbec89f1c1bb41b0e55d60f46092da3:7391a495c95411ebc5f087c4b8f5bcfb2b903d370cedd6a819a9e69b15f03999b9fbc4378a5254751ddb038bfec87facd5b642d0aa28b48b9ecf675b0deceb28","config":"{}","createdAt":"2024-06-14T19:55:29.824Z","updatedAt":"2024-06-14T19:55:29.824Z"},{"id":19,"type":"opnsense","hostname":"firewall.local","credentials":"dd503eaafa2acdae999023a63735b7b8:9af028d461a8b3aea27c6edc013d64e98d33476d8614bdd0ad1cab42601a2517c01cc0342b6946fee8bb5a31ceaa26a659b37051da1584ba163360f9465997154ff7f9344ff5726683fe6183e6e7054f622aeeaaa2402dc416e5ae6edea6cb34ff9d80720bb9942d2ccb90015821f8fa103ec0f116bcc3532b2ff285dad80ec56c90503996b094daf52b5775b224b137a8ba0dc13d29e2e4c37d244ff10bda30bc7ed892390efc3e3ac19dd0845e7cb0e6b3cd88c2f126d2f8d9b7191f85f72f","config":"{}","createdAt":"2024-06-14T19:55:29.823Z","updatedAt":"2024-06-16T16:06:39.091Z"},{"id":83,"type":"hass","hostname":"13232pct.duckdns.org","credentials":"6fb7dd1963eb628e50af98bd55074167:107376648f66355e19787eb82036ea506a9cae6152ed98f1f1739640d2a930f30c54683c9bc3eaebd49043434afeed16b7928ba31b44048477b40d68f2aaf83f015ffc53ed5114eb77fd90e06cfe3f52f8a1638d83a9e104d9a0f00358e42d04733440e7c3c245a926266e3f5d1232022850baa970e38d8a33b032e1ccdadc563574420447cacb8498dbb637dfdfa1927433056b9852cf226df112730cd8e4282e09ce99c30e0854c7ca5144426ad8f7f349fcffea7da3f7970c3ad5af9b33023ad7f057ad4144817f9df0e4c69e1466","config":"{\\"port\\":\\"3000\\"}","createdAt":"2024-07-16T17:13:33.455Z","updatedAt":"2024-07-16T17:13:33.455Z"}],"jobs":[{"id":24,"createdAt":"2024-08-13T21:17:54.387Z","updatedAt":"2024-08-13T21:18:31.499Z","startedAt":"2024-08-13T21:17:54.400Z","finishedAt":"2024-08-13T21:18:31.496Z","status":"completed","scheduleId":6,"_count":{"backups":3}},{"id":23,"createdAt":"2024-08-13T21:15:46.991Z","updatedAt":"2024-08-13T21:15:47.571Z","startedAt":"2024-08-13T21:15:47.004Z","finishedAt":"2024-08-13T21:15:47.570Z","status":"completed","scheduleId":6,"_count":{"backups":2}},{"id":22,"createdAt":"2024-08-13T21:09:42.083Z","updatedAt":"2024-08-13T21:09:42.083Z","startedAt":null,"finishedAt":null,"status":"pending","scheduleId":6,"_count":{"backups":1}},{"id":18,"createdAt":"2024-07-15T15:37:38.955Z","updatedAt":"2024-07-15T15:38:14.366Z","startedAt":"2024-07-15T15:37:38.967Z","finishedAt":"2024-07-15T15:38:14.365Z","status":"completed","scheduleId":6,"_count":{"backups":2}},{"id":17,"createdAt":"2024-07-15T15:36:30.814Z","updatedAt":"2024-07-15T15:37:06.483Z","startedAt":"2024-07-15T15:36:30.828Z","finishedAt":"2024-07-15T15:37:06.482Z","status":"completed","scheduleId":6,"_count":{"backups":2}}]}',
+    role: 'system'
+  },
+  {
+    id: 'QfhU2Z2',
+    content: 'how many devices does this schedule back up?',
+    role: 'user'
+  },
+  { role: 'assistant', content: 'This schedule backs up 3 devices.' },
+  {
+    id: '3Rytlyw',
+    content: 'Component 7df18442-843c-4fc8-a1cf-a5eaa5a9ba9a has updated its state\n' +
+      'Component Name: 3 Most Recent Backups for firewall.local\n' +
+      'Component self-description: This table displays a list of backups taken for various devices. The data will be provided to you in JSON format\n' +
+      'Component props: {"backups":[{"id":65,"jobId":24,"deviceId":19,"createdAt":"2024-08-13T21:17:54.391Z","updatedAt":"2024-08-13T21:17:54.626Z","status":"completed","bytes":57117},{"id":63,"jobId":23,"deviceId":19,"createdAt":"2024-08-13T21:15:46.996Z","updatedAt":"2024-08-13T21:15:47.571Z","status":"completed","bytes":57117},{"id":61,"jobId":22,"deviceId":19,"createdAt":"2024-08-13T21:09:42.091Z","updatedAt":"2024-08-13T21:09:42.091Z","status":"pending","bytes":null}]}',
+    role: 'system'
+  },
+  {
+    id: 'Min6j9V',
+    content: 'did all of those complete successfully?',
+    role: 'user'
+  },
+  {
+    role: 'assistant',
+    content: 'Out of the three most recent backups for the device "firewall.local," two backups completed successfully, and one is still pending:\n' +
+      '\n' +
+      '1. Backup ID 65: Completed\n' +
+      '2. Backup ID 63: Completed\n' +
+      '3. Backup ID 61: Pending'
+  }
+]
+```
+
+It's a little dense to the human eye, but here we can see the first message is from the `system` role, and is a string representation of the content that we supplied to `<InformAI>` in our `SchedulePage` React component. After that we see our user message, followed by another `system` message that inform-ai injected for us because the `<BackupsTable>` was streamed in as a response and published data to inform-ai.
+
+The internal messages stored by inform-ai are converted into LLM-friendly strings via the [mapComponentMessages](https://github.com/edspencer/inform-ai/blob/main/src/utils.ts) function, but it's easy to swap that out for any function you like. The default `mapComponentMessages` function just delegates to a function that looks like this:
+
+```tsx
+export function mapStateToContent(state: StateMessage) {
+  const content = [];
+
+  const { name, componentId, prompt, props } = state.content;
+
+  content.push(`Component ${componentId} has updated its state`);
+
+  if (name) {
+    content.push(`Component Name: ${name}`);
+  }
+
+  if (prompt) {
+    content.push(`Component self-description: ${prompt}`);
+  }
+
+  if (props) {
+    content.push(`Component props: ${JSON.stringify(props)}`);
+  }
+
+  return content.join("\n");
+}
+```

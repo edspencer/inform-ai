@@ -1,7 +1,7 @@
 "use client";
 import { useInformAIContext } from "../InformAIContext";
 import clsx from "clsx";
-import type { Message, StateMessage } from "../types";
+import type { Message } from "../types";
 import { useState } from "react";
 
 import JsonView from "react18-json-view";
@@ -13,14 +13,18 @@ export function CurrentState({ className }: { className?: string }) {
     conversation: { lastSentAt },
   } = useInformAIContext();
 
+  const [collapsed, setCollapsed] = useState(false);
+
   const sentMessages = messages.filter((message) => message.createdAt < lastSentAt);
   const unsentMessages = messages.filter((message) => message.createdAt >= lastSentAt);
 
   return (
     <div className={clsx("current-state", className)}>
-      <h1>Current InformAI State</h1>
+      <h1 onClick={() => setCollapsed(!collapsed)}>
+        Current InformAI State <span className="toggle">{collapsed ? ">" : "v"}</span>
+      </h1>
 
-      <div className="rows">
+      <div className={`rows ${collapsed ? "collapsed" : ""}`}>
         {sentMessages.map((message, index) => (
           <Row key={index} message={message} />
         ))}

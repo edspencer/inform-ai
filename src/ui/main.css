@@ -39,7 +39,7 @@
       @apply flex justify-start;
 
       .inner {
-        @apply max-w-3xl border border-gray-200 bg-gray-50;
+        @apply max-w-3xl border border-gray-200 bg-gray-50 whitespace-pre-wrap;
       }
     }
 
@@ -57,10 +57,18 @@
 
     .rows {
       @apply overflow-auto;
+
+      &.collapsed {
+        @apply h-0 overflow-hidden;
+      }
     }
 
     h1 {
-      @apply text-lg font-semibold;
+      @apply text-lg font-semibold cursor-pointer;
+
+      .toggle {
+        @apply float-right mr-4 font-normal;
+      }
     }
 
     .last-sent-divider {
@@ -71,7 +79,7 @@
       }
 
       p {
-        @apply mx-2 text-sm text-gray-500;
+        @apply mx-2 text-sm text-gray-500 whitespace-nowrap;
       }
     }
 
