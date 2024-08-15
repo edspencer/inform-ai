@@ -11,7 +11,7 @@ export default [
     plugins: [
       postcss({
         extract: true,
-        minimize: true,
+        minimize: false,
       }),
     ],
   },

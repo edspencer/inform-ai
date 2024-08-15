@@ -1,3 +1,106 @@
-@tailwind base;
 @tailwind components;
-@tailwind utilities;
+
+/* ChatBox styles*/
+@layer components {
+  .chatbox {
+    @apply flex gap-2;
+
+    label {
+      @apply sr-only;
+    }
+  }
+  .chatbox-wrap {
+    @apply flex-1;
+  }
+
+  .chatbox-input {
+    @apply px-4 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6;
+  }
+
+  .chatbox-button {
+    @apply px-4 py-1.5 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm sm:leading-5;
+  }
+}
+
+/* Messages styles */
+@layer components {
+  .iai-messages {
+    @apply flex flex-col gap-2;
+
+    .user-message {
+      @apply flex justify-end;
+
+      .inner {
+        @apply max-w-96 border border-blue-200  bg-blue-200;
+      }
+    }
+
+    .assistant-message {
+      @apply flex justify-start;
+
+      .inner {
+        @apply max-w-3xl border border-gray-200 bg-gray-50;
+      }
+    }
+
+    .inner {
+      @apply px-4 py-2 rounded-lg;
+    }
+  }
+
+}
+
+/* CurrentState styles */
+@layer components {
+  .current-state {
+    @apply border border-gray-300 flex flex-col gap-2 rounded-lg bg-white min-w-96 p-2 pr-0;
+
+    .rows {
+      @apply overflow-auto;
+    }
+
+    h1 {
+      @apply text-lg font-semibold;
+    }
+
+    .last-sent-divider {
+      @apply flex justify-center items-center;
+
+      .border {
+        @apply h-0.5 w-1/2 bg-gray-300;
+      }
+
+      p {
+        @apply mx-2 text-sm text-gray-500;
+      }
+    }
+
+    .row {
+      @apply flex flex-col pb-1;
+
+      > .heading {
+        @apply flex items-center pr-2;
+
+        p {
+          @apply flex-1 font-bold pl-1;
+        }
+      }
+
+      pre {
+        @apply ml-2 overflow-x-auto;
+      }
+    }
+
+    .pill {
+      @apply mt-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset;
+
+      &.state {
+        @apply text-green-700 bg-green-50 ring-green-600/20;
+      }
+
+      &.event {
+        @apply text-orange-600 bg-orange-50 ring-orange-500/10;
+      }
+    }
+  }
+}

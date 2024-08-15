@@ -17,12 +17,10 @@ export function CurrentState({ className }: { className?: string }) {
   const unsentMessages = messages.filter((message) => message.createdAt >= lastSentAt);
 
   return (
-    <div
-      className={clsx("border border-gray-300 flex flex-col gap-2 rounded-lg bg-background min-w-96 p-2", className)}
-    >
-      <h1 className="text-lg font-semibold">Current InformAI State</h1>
+    <div className={clsx("current-state", className)}>
+      <h1>Current InformAI State</h1>
 
-      <div className="overflow-auto">
+      <div className="rows">
         {sentMessages.map((message, index) => (
           <Row key={index} message={message} />
         ))}
@@ -41,38 +39,24 @@ export function LastSentDivider() {
   } = useInformAIContext();
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="h-0.5 w-1/2 bg-gray-300"></div>
-      <p className="mx-2 text-sm text-gray-500">
+    <div className="last-sent-divider">
+      <div className="border"></div>
+      <p>
         Last Sent: {lastSentAt.getHours()}:{lastSentAt.getMinutes().toString().padStart(2, "0")}
       </p>
-      <div className="h-0.5 w-1/2 bg-gray-300"></div>
+      <div className="border"></div>
     </div>
   );
 }
 
-const pills = {
-  state: "text-green-700 bg-green-50 ring-green-600/20",
-  event: "text-orange-600 bg-orange-50 ring-orange-500/10",
-};
-
 export function MessageTypePill({ message }: { message: Message }) {
-  return (
-    <p
-      className={clsx(
-        pills[message.type],
-        "mt-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset"
-      )}
-    >
-      {message.type}
-    </p>
-  );
+  return <span className={clsx(message.type, "pill")}>{message.type}</span>;
 }
 
 export function ComponentName({ message }: { message: Message }) {
   const name = message.type === "state" ? message.content.name : message.content.type;
 
-  return <p className="flex-1 font-bold pl-1">{name}</p>;
+  return <p>{name}</p>;
 }
 
 export function Row({ message }: { message: Message }) {
@@ -83,21 +67,19 @@ export function Row({ message }: { message: Message }) {
   };
 
   return (
-    <div className="flex flex-col pb-1">
-      <div className="flex items-center">
+    <div className="row">
+      <div className="heading">
         <button onClick={toggleExpanded}>{expanded ? <span>-</span> : <span>+</span>}</button>
         <ComponentName message={message} />
         <MessageTypePill message={message} />
       </div>
-      <div className="">
+      <div>
         <p>{message.createdAt.toLocaleTimeString()}</p>
       </div>
       {expanded && (
-        <div className="ml-4">
-          <pre className="overflow-x-auto">
-            <JsonView src={message.content} />
-          </pre>
-        </div>
+        <pre>
+          <JsonView src={message.content} />
+        </pre>
       )}
     </div>
   );
