@@ -1,5 +1,15 @@
 # inform-ai
 
+## 0.2.2
+
+### Patch Changes
+
+- 0b50a6c: Allow CurrentState to be collapsed
+- 0b50a6c: Refactored mapComponentState and related functions into separate file
+- 64e9e3e: Remove .npmignore, whitelist files in package.json
+- 0b50a6c: Expanded README, swapped streamMulti for streamUI
+- 1b0aaee: Migrate to tailwind apply statements rather than inline classNames
+
 ## 0.2.1
 
 ### Patch Changes
