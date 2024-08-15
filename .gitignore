@@ -65,8 +65,5 @@ yarn.lock
 # TypeScript build artifacts
 *.tsbuildinfo
 
-# Documentation artifacts
-docs/
-
 # Lint and formatting results
 stylelint.cache

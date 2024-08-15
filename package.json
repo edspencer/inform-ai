@@ -16,6 +16,13 @@
     "ai",
     "react"
   ],
+  "files": [
+    "/dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edspencer/inform-ai.git"
+  },
   "author": "Ed Spencer",
   "license": "ISC",
   "devDependencies": {
