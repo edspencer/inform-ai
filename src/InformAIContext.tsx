@@ -8,7 +8,7 @@ import { StateMessage, EventMessage, Message, ComponentState, ComponentEvent, Co
 /**
  * Defines the shape of the InformAIContext.
  */
-interface InformAIContextType {
+export interface InformAIContextType {
   messages: Message[];
   conversation: Conversation;
   addMessage: (message: Message) => void;
@@ -29,7 +29,7 @@ interface InformAIContextType {
 /**
  * The InformAIContext that provides access to messages and conversation state.
  */
-const InformAIContext = createContext<InformAIContextType | undefined>(undefined);
+export const InformAIContext = createContext<InformAIContextType | undefined>(undefined);
 
 /**
  * Props for the InternalInformAIProvider component.
@@ -57,6 +57,7 @@ export const InternalInformAIProvider = ({ children, onEvent }: InformAIProvider
    */
   function getState(componentId: string) {
     return messages
+      .reverse()
       .filter((message) => message.type === "state")
       .map((message) => message as StateMessage)
       .find((message) => message.content.componentId === componentId)?.content;
@@ -104,7 +105,7 @@ export const InternalInformAIProvider = ({ children, onEvent }: InformAIProvider
    */
   function clearRecentMessages(since?: Date) {
     const cutoff = since || conversation.lastSentAt;
-    setMessages((prevMessages) => prevMessages.filter((message) => message.createdAt <= cutoff));
+    setMessages((prevMessages) => prevMessages.filter((message) => message.createdAt < cutoff));
   }
 
   /**
@@ -163,7 +164,7 @@ export const InternalInformAIProvider = ({ children, onEvent }: InformAIProvider
    * @returns The messages since the specified date.
    */
   function getMessagesSince(since: Date) {
-    return messages.filter((message) => message.createdAt > since);
+    return messages.filter((message) => message.createdAt >= since);
   }
 
   /**
