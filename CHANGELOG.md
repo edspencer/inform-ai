@@ -1,5 +1,14 @@
 # inform-ai
 
+## 0.2.4
+
+### Patch Changes
+
+- d40bed0: Allow ChatBox placeholder customization
+- d40bed0: nicer chevron for CurrentState
+- d40bed0: Show no-messages message
+- d40bed0: Allow ChatBox to be autoFocus or not
+
 ## 0.2.3
 
 ### Patch Changes
