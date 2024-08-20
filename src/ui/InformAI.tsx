@@ -20,6 +20,20 @@
 
 import { useInformAI } from "../useInformAI";
 
+/**
+ * A component for relaying information about a component to a LLM via InformAI.
+ * Sample usage:
+ *
+ * import { InformAI } from "inform-ai";
+ *
+ * //inside your component's template
+ * <InformAI name="Logs" prompt="This component displays backup logs in a monospace font" props={{data, logs}} />
+ *
+ * @param {string} name - The name of the component.
+ * @param {string} prompt - The prompt for the InformAI service.
+ * @param {any} props - Additional props for the component.
+ * @returns {null}
+ */
 export function InformAI({ name, prompt, props }: { name: string; prompt: string; props: any }) {
   useInformAI({
     name,

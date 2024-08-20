@@ -53,7 +53,7 @@
 /* CurrentState styles */
 @layer components {
   .current-state {
-    @apply border border-gray-300 flex flex-col gap-2 rounded-lg bg-white min-w-96 p-2 pr-0;
+    @apply border border-gray-300 flex flex-col gap-2 rounded-lg bg-white p-2 pr-0;
 
     .rows {
       @apply overflow-auto;
@@ -64,7 +64,7 @@
     }
 
     h1 {
-      @apply text-lg font-semibold cursor-pointer;
+      @apply text-lg font-semibold cursor-pointer mb-0;
 
       .toggle {
         @apply float-right mr-4 font-normal;
@@ -109,6 +109,42 @@
       &.event {
         @apply text-orange-600 bg-orange-50 ring-orange-500/10;
       }
+    }
+  }
+
+  .chevron {
+    width: 18px;
+    height: 15px;
+
+    &__group {
+      transform: translateY(0);
+      transition: transform 0.1s linear;
+    }
+
+    &__box--left,
+    &__box--right {
+      transform: rotate(0) translateY(0);
+      transition: transform 0.1s linear;
+    }
+
+    &__box--left {
+      transform-origin: 1px 1px;
+    }
+
+    &__box--right {
+      transform-origin: 7px 1px;
+    }
+
+    &--flip &__box--left {
+      transform: rotate(-90deg) translateY(0);
+    }
+
+    &--flip &__box--right {
+      transform: rotate(90deg) translateY(0);
+    }
+
+    &--flip &__group {
+      transform: translateY(3px);
     }
   }
 }

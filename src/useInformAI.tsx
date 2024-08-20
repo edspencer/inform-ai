@@ -16,19 +16,28 @@ export interface UseInformAIHook {
   updateState: (updates: ComponentState) => void;
 }
 
+/**
+ * A hook to interact with the Inform AI context.
+ *
+ * Sample usage:
+ *
+ * import { useInformAI } from "use-inform-ai";
+ *
+ * //inside your component:
+ * useInformAI({name: "Logs", prompt: "This component displays backup logs in a monospace font", props: {data, logs}});
+ *
+ * @param {ComponentState} componentData - The data for the component.
+ * @return {UseInformAIHook} An object with methods to add messages, events, and states to the Inform AI context.
+ */
 export function useInformAI(componentData: ComponentState): UseInformAIHook {
   const context = useInformAIContext();
   const componentIdRef = useRef<string>(componentData.componentId || uuidv4());
   const componentId = componentIdRef.current;
 
-  // console.log("useInformAI", componentIdRef.current);
-
   // Memoize componentData to ensure stability
   const stableComponentData = useMemo(() => componentData, [JSON.stringify(componentData)]);
 
   useEffect(() => {
-    console.log("Adding a state message", componentIdRef.current);
-
     if (!componentData.noState) {
       context.addState({
         componentId: componentIdRef.current,

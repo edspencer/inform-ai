@@ -39,7 +39,7 @@ export function ChatWrapper({ className, AI }: { className?: string; AI: any }) 
   }
 
   return (
-    <div className={clsx("flex flex-col border border-blue-600 p-1", className)}>
+    <div className={clsx("flex flex-col p-1", className)}>
       <Messages messages={messages} />
       <ChatBox onSubmit={onMessage} />
     </div>

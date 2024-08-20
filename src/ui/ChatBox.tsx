@@ -1,6 +1,21 @@
 "use client";
 
-export function ChatBox({ onSubmit }: { onSubmit: (message: string) => Promise<boolean> }) {
+/**
+ * A reusable chat box component that accepts user input and submits it via a callback function.
+ *
+ * @param {boolean} autoFocus - Whether the input field should automatically focus when the component mounts.
+ * @param {(message: string) => Promise<boolean>} onSubmit - A callback function that handles the submission of the user's message.
+ * @return {JSX.Element} The rendered chat box component.
+ */
+export function ChatBox({
+  autoFocus = false,
+  placeholder = "Ask me anything...",
+  onSubmit,
+}: {
+  autoFocus?: boolean;
+  placeholder?: string | null;
+  onSubmit: (message: string) => Promise<boolean>;
+}) {
   return (
     <form
       onSubmit={async (e: any) => {
@@ -25,11 +40,11 @@ export function ChatBox({ onSubmit }: { onSubmit: (message: string) => Promise<b
         </label>
         <input
           autoComplete="off"
-          autoFocus
+          autoFocus={autoFocus}
           id="message"
           name="message"
           type="message"
-          placeholder="Ask me anything..."
+          placeholder={placeholder || undefined}
           className="chatbox-input"
         />
       </div>
