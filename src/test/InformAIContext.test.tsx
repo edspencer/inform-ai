@@ -1,7 +1,6 @@
-import "@testing-library/jest-dom";
 import { render, screen, act } from "@testing-library/react";
 import { InformAIContextType, InternalInformAIProvider, useInformAIContext } from "../InformAIContext";
-import { Message, ComponentState, ComponentEvent } from "../types";
+import { ComponentState, ComponentEvent } from "../types";
 
 describe("InternalInformAIProvider", () => {
   it("renders children correctly", () => {

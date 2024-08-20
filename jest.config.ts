@@ -14,6 +14,8 @@ const jestConfig: JestConfigWithTsJest = {
   modulePaths: ["<rootDir>"],
   transformIgnorePatterns: ["/node_modules/(?!react18-json-view)"],
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],
+
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 };
 
 export default jestConfig;
