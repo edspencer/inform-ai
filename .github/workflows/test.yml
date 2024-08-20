@@ -2,7 +2,6 @@ name: Run Jest Tests
 
 on:
   push: # Runs on all pushes
-  pull_request: # Runs on all pull requests
 
 jobs:
   test:
