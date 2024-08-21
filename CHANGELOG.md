@@ -1,5 +1,13 @@
 # inform-ai
 
+## 0.2.5
+
+### Patch Changes
+
+- ffe5ae6: Use nanoid for generating ids
+- 59ade55: Simplify InformAIProvider
+- ffe5ae6: Add some tests
+
 ## 0.2.4
 
 ### Patch Changes
