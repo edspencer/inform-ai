@@ -5,7 +5,7 @@ import type { Message } from "../types";
 import { useState } from "react";
 
 import JsonView from "react18-json-view";
-import "react18-json-view/src/style.css";
+// import "react18-json-view/src/style.css";
 
 /**
  * Displays the current state of the InformAI conversation, including sent and unsent messages.

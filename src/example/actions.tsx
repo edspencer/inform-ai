@@ -15,8 +15,6 @@ export async function submitUserMessage(content: string, role: string = "user") 
 
   const aiState = getMutableAIState<typeof AI>();
 
-  console.log("submitUserMessage");
-
   aiState.update({
     ...aiState.get(),
     messages: [
