@@ -57,10 +57,6 @@
 
     .rows {
       @apply overflow-auto;
-
-      &.collapsed {
-        @apply h-0 overflow-hidden;
-      }
     }
 
     h1 {
