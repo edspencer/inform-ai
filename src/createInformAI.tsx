@@ -1,4 +1,4 @@
-import { InternalInformAIProvider } from "./InformAIContext";
+import { InformAIProvider } from "./InformAIContext";
 
 type InformAIProvider = (props: {
   onEvent?: (message: string) => void;
@@ -7,7 +7,7 @@ type InformAIProvider = (props: {
 
 export function createInformAI({ onEvent }: { onEvent?: (event: any) => void } = {}) {
   const InformAI: InformAIProvider = (props) => {
-    return <InternalInformAIProvider onEvent={onEvent}>{props.children}</InternalInformAIProvider>;
+    return <InformAIProvider onEvent={onEvent}>{props.children}</InformAIProvider>;
   };
 
   return InformAI;

@@ -1,13 +1,13 @@
 import { render, screen, act } from "@testing-library/react";
-import { InformAIContextType, InternalInformAIProvider, useInformAIContext } from "../InformAIContext";
+import { InformAIContextType, InformAIProvider, useInformAIContext } from "../InformAIContext";
 import { ComponentState, ComponentEvent } from "../types";
 
-describe("InternalInformAIProvider", () => {
+describe("InformAIProvider", () => {
   it("renders children correctly", () => {
     render(
-      <InternalInformAIProvider>
+      <InformAIProvider>
         <div>Test Child</div>
-      </InternalInformAIProvider>
+      </InformAIProvider>
     );
     expect(screen.getByText("Test Child")).toBeInTheDocument();
   });
@@ -20,9 +20,9 @@ describe("InternalInformAIProvider", () => {
     };
 
     render(
-      <InternalInformAIProvider>
+      <InformAIProvider>
         <TestComponent />
-      </InternalInformAIProvider>
+      </InformAIProvider>
     );
 
     expect(contextValues!.messages).toEqual([]);
@@ -41,9 +41,9 @@ describe("InternalInformAIProvider", () => {
     };
 
     render(
-      <InternalInformAIProvider>
+      <InformAIProvider>
         <TestComponent />
-      </InternalInformAIProvider>
+      </InformAIProvider>
     );
 
     act(() => {
@@ -66,9 +66,9 @@ describe("InternalInformAIProvider", () => {
     };
 
     render(
-      <InternalInformAIProvider>
+      <InformAIProvider>
         <TestComponent />
-      </InternalInformAIProvider>
+      </InformAIProvider>
     );
 
     act(() => {
@@ -93,9 +93,9 @@ describe("InternalInformAIProvider", () => {
     };
 
     render(
-      <InternalInformAIProvider>
+      <InformAIProvider>
         <TestComponent />
-      </InternalInformAIProvider>
+      </InformAIProvider>
     );
 
     act(() => {
@@ -118,9 +118,9 @@ describe("InternalInformAIProvider", () => {
     };
 
     render(
-      <InternalInformAIProvider>
+      <InformAIProvider>
         <TestComponent />
-      </InternalInformAIProvider>
+      </InformAIProvider>
     );
 
     act(() => {

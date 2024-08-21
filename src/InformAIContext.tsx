@@ -32,17 +32,17 @@ export interface InformAIContextType {
 export const InformAIContext = createContext<InformAIContextType | undefined>(undefined);
 
 /**
- * Props for the InternalInformAIProvider component.
+ * Props for the InformAIProvider component.
  */
 interface InformAIProviderProps {
-  children: ReactNode;
+  children?: ReactNode;
   onEvent?: (event: any) => void;
 }
 
 /**
  * The internal implementation of the InformAIProvider component.
  */
-export const InternalInformAIProvider = ({ children, onEvent }: InformAIProviderProps) => {
+export const InformAIProvider = ({ children, onEvent }: InformAIProviderProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversation, setConversation] = useState<Conversation>({
     id: uuidv4(),
