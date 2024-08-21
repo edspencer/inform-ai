@@ -64,10 +64,10 @@
     }
 
     h1 {
-      @apply text-lg font-semibold cursor-pointer mb-0;
+      @apply text-lg font-semibold cursor-pointer my-0;
 
       .toggle {
-        @apply float-right mr-4 font-normal;
+        @apply float-right mr-4 font-normal pt-2;
       }
     }
 
@@ -116,34 +116,34 @@
     width: 18px;
     height: 15px;
 
-    &__group {
+    .chevron__group {
       transform: translateY(0);
       transition: transform 0.1s linear;
     }
 
-    &__box--left,
-    &__box--right {
+    .chevron__box--left,
+    .chevron__box--right {
       transform: rotate(0) translateY(0);
       transition: transform 0.1s linear;
     }
 
-    &__box--left {
+    .chevron__box--left {
       transform-origin: 1px 1px;
     }
 
-    &__box--right {
+    .chevron__box--right {
       transform-origin: 7px 1px;
     }
 
-    &--flip &__box--left {
+    &.chevron--flip .chevron__box--left {
       transform: rotate(-90deg) translateY(0);
     }
 
-    &--flip &__box--right {
+    &.chevron--flip .chevron__box--right {
       transform: rotate(90deg) translateY(0);
     }
 
-    &--flip &__group {
+    &.chevron--flip .chevron__group {
       transform: translateY(3px);
     }
   }
