@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.2.6
+
+### Patch Changes
+
+- 1dff333: CSS fixes
+
 ## 0.2.5
 
 ### Patch Changes
