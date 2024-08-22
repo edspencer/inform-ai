@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import randomId from "./randomId";
+import { randomId } from "./utils";
 
 import { StateMessage, EventMessage, Message, ComponentState, ComponentEvent, Conversation } from "./types";
 

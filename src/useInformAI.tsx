@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import randomId from "./randomId";
+import { randomId } from "./utils";
 
 import { useInformAIContext } from "./InformAIContext";
 import { StateMessage, EventMessage, Message, ComponentState, ComponentEvent, OptionalComponentEvent } from "./types";
