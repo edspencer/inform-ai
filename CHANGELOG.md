@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.2.7
+
+### Patch Changes
+
+- 5f744ee: Fix CSS build
+
 ## 0.2.6
 
 ### Patch Changes
