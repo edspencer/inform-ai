@@ -47,7 +47,6 @@
       @apply px-4 py-2 rounded-lg;
     }
   }
-
 }
 
 /* CurrentState styles */
@@ -70,7 +69,7 @@
     .last-sent-divider {
       @apply flex justify-center items-center;
 
-      .border {
+      .last-sent-border {
         @apply h-0.5 w-1/2 bg-gray-300;
       }
 

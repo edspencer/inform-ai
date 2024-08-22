@@ -94,11 +94,11 @@ export function LastSentDivider() {
 
   return (
     <div className="last-sent-divider">
-      <div className="border"></div>
+      <div className="last-sent-border"></div>
       <p>
         Last Sent: {lastSentAt.getHours()}:{lastSentAt.getMinutes().toString().padStart(2, "0")}
       </p>
-      <div className="border"></div>
+      <div className="last-sent-border"></div>
     </div>
   );
 }
