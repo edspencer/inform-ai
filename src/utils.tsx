@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import randomId from "./randomId";
 import { EventMessage, Message, StateMessage } from "./types";
 
 /**
@@ -9,7 +9,7 @@ import { EventMessage, Message, StateMessage } from "./types";
 export function mapComponentMessages(componentMessages: Message[]) {
   return componentMessages.map((message) => {
     return {
-      id: nanoid(10),
+      id: randomId(10),
       content: message.type === "event" ? mapEventToContent(message) : mapStateToContent(message),
       role: "system",
     };

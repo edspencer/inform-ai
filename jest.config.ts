@@ -12,7 +12,7 @@ const jestConfig: JestConfigWithTsJest = {
     "\\.(css|less|sass|scss)$": "identity-obj-proxy",
   },
   modulePaths: ["<rootDir>"],
-  transformIgnorePatterns: ["/node_modules/(?!react18-json-view)"],
+  transformIgnorePatterns: ["/node_modules/(?!nanoid|react18-json-view)"],
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],
 
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],

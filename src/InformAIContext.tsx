@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { v4 as uuidv4 } from "uuid";
+import randomId from "./randomId";
 
 import { StateMessage, EventMessage, Message, ComponentState, ComponentEvent, Conversation } from "./types";
 
@@ -45,7 +45,7 @@ interface InformAIProviderProps {
 export const InformAIProvider = ({ children, onEvent }: InformAIProviderProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversation, setConversation] = useState<Conversation>({
-    id: uuidv4(),
+    id: randomId(8),
     createdAt: new Date(),
     lastSentAt: new Date(),
   });
@@ -77,7 +77,7 @@ export const InformAIProvider = ({ children, onEvent }: InformAIProviderProps) =
    */
   function addState(state: ComponentState) {
     addMessage({
-      id: uuidv4(),
+      id: randomId(8),
       createdAt: new Date(),
       type: "state",
       content: state,
@@ -131,7 +131,7 @@ export const InformAIProvider = ({ children, onEvent }: InformAIProviderProps) =
    */
   function addEvent(event: ComponentEvent) {
     addMessage({
-      id: uuidv4(),
+      id: randomId(8),
       createdAt: new Date(),
       type: "event",
       content: event,

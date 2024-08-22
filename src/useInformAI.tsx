@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
+import randomId from "./randomId";
 
 import { useInformAIContext } from "./InformAIContext";
 import { StateMessage, EventMessage, Message, ComponentState, ComponentEvent, OptionalComponentEvent } from "./types";
@@ -74,7 +74,7 @@ export interface UseInformAIHook {
  */
 export function useInformAI(componentData: ComponentState): UseInformAIHook {
   const context = useInformAIContext();
-  const componentIdRef = useRef<string>(componentData.componentId || uuidv4());
+  const componentIdRef = useRef<string>(componentData.componentId || randomId(6));
   const componentId = componentIdRef.current;
 
   // Memoize componentData to ensure stability
