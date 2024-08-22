@@ -1,5 +1,13 @@
 # inform-ai
 
+## 0.2.8
+
+### Patch Changes
+
+- 5e92ebf: Refactor randomId into utils
+- 8e819a3: Fix JsonView CSS import
+- 8e819a3: Create shorter IDs for components and messages
+
 ## 0.2.7
 
 ### Patch Changes
