@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.2.9
+
+### Patch Changes
+
+- a172371: CI changes
+
 ## 0.2.8
 
 ### Patch Changes
