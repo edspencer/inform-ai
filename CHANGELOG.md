@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.3.2
+
+### Patch Changes
+
+- c2bb195: Delete vestigial example dir
+
 ## 0.3.1
 
 ### Patch Changes
