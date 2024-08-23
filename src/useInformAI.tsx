@@ -72,7 +72,7 @@ export interface UseInformAIHook {
  * @param {ComponentState} componentData - The data for the component.
  * @return {UseInformAIHook} An object with methods to add messages, events, and states to the Inform AI context.
  */
-export function useInformAI(componentData: ComponentState): UseInformAIHook {
+export function useInformAI(componentData: ComponentState = {}): UseInformAIHook {
   const context = useInformAIContext();
   const componentIdRef = useRef<string>(componentData.componentId || randomId(6));
   const componentId = componentIdRef.current;

@@ -8,6 +8,7 @@ const jestConfig: JestConfigWithTsJest = {
     // "^.+\\.(t|j)sx?$": ["@swc/jest"],
   },
   moduleNameMapper: {
+    "^ai/rsc$": "<rootDir>/node_modules/ai/rsc/dist",
     "^@/(.*)$": "<rootDir>/$1",
     "\\.(css|less|sass|scss)$": "identity-obj-proxy",
   },

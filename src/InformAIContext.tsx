@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { randomId } from "./utils";
 
 import { StateMessage, EventMessage, Message, ComponentState, ComponentEvent, Conversation } from "./types";
@@ -40,7 +40,20 @@ interface InformAIProviderProps {
 }
 
 /**
- * The internal implementation of the InformAIProvider component.
+ * The internal implementation of the InformAIProvider component. Sample usage:
+ *
+ * import { InformAIProvider } from 'inform-ai';
+ *
+ * export default function MyComponent() {
+ *   return (
+ *     <InformAIProvider>
+ *       {children}
+ *     </InformAIProvider>
+ *   );
+ * }
+ *
+ * Now within child React components you can use useInformAI() or <InformAI /> to surface
+ * information about your components to the LLM.
  */
 export const InformAIProvider = ({ children, onEvent }: InformAIProviderProps) => {
   const [messages, setMessages] = useState<Message[]>([]);

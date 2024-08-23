@@ -52,7 +52,7 @@ export function UserMessage({ message }: { message: string }) {
 }
 
 /**
- * A component for rendering an assistant message.
+ * A component for rendering an assistant message. Supports streaming.
  *
  * @param {any} content - The content of the assistant message.
  * @return {JSX.Element} The rendered assistant message component.
