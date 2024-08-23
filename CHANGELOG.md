@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.3.1
+
+### Patch Changes
+
+- 7ce83dd: Rearrange dependencies, devDependencies and peerDependencies
+
 ## 0.3.0
 
 ### Minor Changes
