@@ -1,5 +1,16 @@
 # inform-ai
 
+## 0.3.0
+
+### Minor Changes
+
+- 1254ce9: Built-in ChatWrapper component
+
+### Patch Changes
+
+- 1254ce9: More jest tests
+- 1254ce9: Docs and tests
+
 ## 0.2.9
 
 ### Patch Changes
