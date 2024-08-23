@@ -136,15 +136,15 @@ describe("InformAIProvider", () => {
   });
 
   it("throws error when useInformAIContext is used outside of provider", () => {
-    const renderOutsideProvider = () => {
-      const TestComponent = () => {
-        useInformAIContext();
-        return null;
-      };
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      render(<TestComponent />);
+    const TestComponent = () => {
+      useInformAIContext();
+      return null;
     };
 
-    expect(renderOutsideProvider).toThrow("useInformAIContext must be used within an InformAIProvider");
+    expect(() => render(<TestComponent />)).toThrow("useInformAIContext must be used within an InformAIProvider");
+
+    consoleError.mockRestore(); // Restore the original console.error behavior
   });
 });
