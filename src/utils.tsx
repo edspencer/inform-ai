@@ -1,4 +1,4 @@
-import { EventMessage, Message, StateMessage } from "./types";
+import { EventMessage, Message, StateMessage, FormattedMessage } from "./types";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -17,7 +17,7 @@ export function randomId(length = 8) {
  * @param componentMessages - The array of component messages to be mapped.
  * @returns An array of formatted messages.
  */
-export function mapComponentMessages(componentMessages: Message[]) {
+export function mapComponentMessages(componentMessages: Message[]): FormattedMessage[] {
   return componentMessages.map((message) => {
     return {
       id: randomId(10),

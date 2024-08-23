@@ -18,18 +18,21 @@ export function ChatBox({
 }) {
   return (
     <form
+      role="form"
       onSubmit={async (e: any) => {
         e.preventDefault();
 
+        const messageEl = e.target.elements["message"];
+
         // Blur focus on mobile
         if (window.innerWidth < 600) {
-          e.target["message"]?.blur();
+          messageEl?.blur();
         }
 
-        const submitSuccess = await onSubmit(e.target["message"].value);
+        const submitSuccess = await onSubmit(messageEl?.value);
 
         if (submitSuccess) {
-          e.target["message"].value = "";
+          messageEl.value = "";
         }
       }}
       className="chatbox"
@@ -41,7 +44,6 @@ export function ChatBox({
         <input
           autoComplete="off"
           autoFocus={autoFocus}
-          id="message"
           name="message"
           type="message"
           placeholder={placeholder || undefined}
