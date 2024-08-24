@@ -21,11 +21,10 @@ export interface ChatWrapperProps {
  *
  * import { ChatWrapper } from "inform-ai";
  * import { useActions, useUIState } from "ai/rsc";
- * import { AIProvider } from "./AI";
  *
  * export function MyCustomChatWrapper() {
  *   const { submitUserMessage } = useActions();
- *   const [messages, setMessages] = useUIState<typeof AIProvider>();
+ *   const [messages, setMessages] = useUIState();
  *
  *   return (
  *     <ChatWrapper
@@ -62,6 +61,7 @@ export interface ChatWrapperProps {
  *
  * function submitUserMessage() {
  *   //your implementation to send message to the LLM via Vercel AI SDK
+ *   //probably using the streamUI, streamText or similar functions
  * }
  *
  * export const AIProvider = createAI<AIState, UIState>({

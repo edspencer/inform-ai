@@ -1,10 +1,14 @@
-# InformAI - Easy & Useful AI for React apps
+# InformAI - Context-Aware AI Integration for React Apps
 
-InformAI allows you to easily retrofit context-aware AI into any React application. It works really well alongside the excellent [Vercel AI SDK](https://sdk.vercel.ai/docs/introduction). It shines when used in combination with Next JS and especially React Server Components, but these are not mandatory.
+**InformAI** is a tool that enables seamless integration of context-aware AI into any React application. It's designed to work effortlessly with the [Vercel AI SDK](https://sdk.vercel.ai/docs/introduction), but is also compatible with other AI SDK providers.
 
-InformAI provides a simple way to expose the state of your React components to any LLM. It also lets your components publish events, like user clicks or other interactions. It makes it easy to send this information in an LLM-optimized format to calls to your LLM. It doesn't send stuff to the LLM, but it makes it easy to integrate with libraries that do (like the Vercel AI SDK).
+### Key Features:
 
-It works with both traditional client side React components as well as React Server Components.
+- **Contextual AI Integration**: Easily expose the state of your React components to an LLM (Large Language Model) or other AI, providing valuable context with minimal effort.
+- **Event Publishing**: Allow your components to publish events, like user interactions, in an LLM-optimized format.
+- **Flexible Usage**: Works well with both client-side React components and React Server Components. Though it excels with Next.js and React Server Components, these are not required.
+
+InformAI doesn't directly send data to your LLM but simplifies integration with tools like the Vercel AI SDK, making it easy to incorporate AI into your app.
 
 ## Installation
 
@@ -14,40 +18,232 @@ Install the NPM package:
 npm install inform-ai
 ```
 
-Include the stylesheet if you plan to use the included UI components:
+Include the stylesheet if you plan to use the included UI components (or don't, if you want to use them but customize their appearance):
 
 ```tsx
 import "inform-ai/dist/main.css";
 ```
 
-## Conceptual Overview
+## Installing the Provider
 
-InformAI allows you to expose the state of any number of your React components to an AI - usually an LLM. It also allows components to notify the LLM of events that have occurred, such as the user clicking something, entering text, or some other interaction with the Component.
+InformAI can be used via either the `<InformAI />` Component or the `useInformAI` hook. Either way, you need to wrap any components using InformAI inside an `InformAIProvider`:
 
-Under the covers, InformAI creates an array of component-generated messages that will be sent to the LLM along with whatever message the user types in to your chat box (a simple ChatBox component is included in InformAI). When you are ready to execute the LLM (usually in response to the user entering some text into a chat box), these component-generated messages are processed, deduped, made LLM-friendly and passed along with your user's message.
+```tsx
+import { InformAIProvider } from "inform-ai";
 
-InformAI contains the following:
+//somewhere in your layout.tsx or similar:
+<InformAIProvider>{children}</InformAIProvider>;
+```
 
-- A React Context Provider, created by `createInformAI()` - analogous to Vercel AI SDK's [createAI](https://sdk.vercel.ai/docs/reference/ai-sdk-rsc/create-ai) function
-- A React Component called `<InformAI />`, which takes a name, a prompt to pass to the LLM, and arbitrary props
-- A React hook called `useInformAI`, which allows you to do the same as `<InformAI />` but programmatically
-- A handful of pre-built UI components like a `ChatBox`, `CurrentState` (to debug what InformAI currently knows about) and simple message wrappers
+## Exposing Component state
 
-## Usage
+Now, within any React component that will be rendered inside that `InformAIProvider`, you can insert a `<InformAI />` node:
 
-InformAI doesn't integrate directly with an LLM itself - there are several libraries out there already that do that. One of the best of the bunch is the Vercel AI SDK
-This assumes that you have both the Vercel AI SDK and inform-ai npm packages installed.
+```tsx
+import { InformAI } from "inform-ai";
 
-To use InformAI, first we need to define our Vercel AI Provider and our InformAI Provider (we will come back to the definition of `submitUserMessage` later):
+const prompt = "Shows the life history of a person, including their name, title and age";
+
+export function Bio({ name, title, age }) {
+  return (
+    <div className="my-component">
+      <InformAI name={`Biography for ${name}`} props={{ name, title, age }} prompt={prompt} />
+      //... rest of the component here
+    </div>
+  );
+}
+```
+
+Adding the `<InformAI />` tag to our component we were able to tell the LLM 3 things about our component:
+
+- **name** - a meaningful name for this specific component instance
+- **props** - any props we want to pass to the LLM (must be JSON-serializable)
+- **prompt** - a string to help the LLM understand what the component does
+
+### useInformAI
+
+An alternative to the `<InformAI />` component is to use the `useInformAI` hook. `useInformAI` is a little more versatile than `<InformAI />`. Here's a slightly simplified example taken from the [backups table from lansaver](https://github.com/edspencer/lansaver/blob/main/components/backup/table.tsx), showing how to use `useInformAI` instead of `<InformAI />`:
+
+```tsx
+import { useInformAI } from "inform-ai";
+
+const prompt =
+  "This table displays a list of backups taken for various devices. The data will be provided to you in JSON format";
+
+export function BackupsTable({
+  name = "Backups Table",
+  backups,
+  showDevice = false,
+}: {
+  name?: string;
+  backups: BackupWithDevice[];
+  showDevice?: boolean;
+}) {
+  useInformAI({
+    name,
+    prompt,
+    props: {
+      backups,
+    },
+  });
+
+  if (condensed) {
+    return <CondensedBackupsTable backups={backups} showDevice={showDevice} />;
+  }
+
+  return <table>//your table implementation</table>;
+}
+```
+
+It was useful to use the hook in this case as we render a different table if `condensed` is set to true, but we wanted to surface the same information either way to InformAI, so by using 'useInformAI' we didn't need to maintain 2 duplicate copies of an `<InformAI />` tag in our 2 table components.
+
+## Exposing Component events
+
+Another possibility that is unlocked by using `useInformAI` is telling the LLM about component events like clicks or other user interactions:
+
+Here's an example of a different Table component, which can render arbitrary data and exposes `click` events when the user clicks on a table cell:
+
+```tsx
+const defaultPrompt = `This component is a table that displays data in a tabular format. 
+It takes two props: data and colHeaders. The data prop is an array of objects, where 
+each object represents a row in the table. The colHeaders prop is an optional 
+array of strings that represent the column headers of the table. 
+If the colHeaders prop is not provided, the component will use the 
+keys of the first object in the data array as the column headers. 
+The component will render the table with the provided data and column headers.`;
+
+export function Table({ data, colHeaders, name = "Table", informPrompt = defaultPrompt, header }: TableProps) {
+  const { addEvent } = useInformAI({
+    name,
+    prompt: informPrompt,
+    props: {
+      data,
+      colHeaders,
+    },
+  });
+
+  //adds a new hint to the AI
+  const cellClicked = (e: React.MouseEvent<HTMLTableCellElement>) => {
+    addEvent({
+      type: "user-click",
+      description: "User clicked on a cell with data: " + (e.target as HTMLElement).innerHTML,
+    });
+  };
+
+  return (
+    <div className="border border-gray-500 flex-1">
+      {header}
+      <table className="min-w-full divide-y divide-gray-300">
+        <thead>
+          <tr>
+            {colHeaders
+              ? colHeaders.map((header, index) => <TableHeaderCell key={index}>{header.label}</TableHeaderCell>)
+              : Object.keys(data[0]).map((header, index) => <TableHeaderCell key={index}>{header}</TableHeaderCell>)}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {Object.values(row).map((cell, cellIndex) => (
+                <TableCell key={cellIndex} onClick={cellClicked}>
+                  {cell as ReactNode}
+                </TableCell>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+```
+
+The `type` and `description` we pass can be any strings we like.
+
+`useInformAI`
+
+## Viewing Current State
+
+Under the covers, InformAI collects together all of the component state and event messages that are published by `<InformAI />` and `useInformAI`. While in development, it's useful to be able to see what InformAI is aware of, and what will be sent with the next user message to the LLM.
+
+InformAI ships with a small React component called `<CurrentState />` which can be rendered anywhere inside your component tree, and will show you all of the component states and events that InformAI has collected.
+
+Drop this into your layout.tsx like so:
+
+```tsx
+import "inform-ai/dist/main.css";
+import "./globals.css";
+
+//optionally include the CurrentState component for easier InformAI debugging
+import { InformAIProvider, CurrentState } from "inform-ai";
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body>
+        <InformAIProvider>
+          {children}
+          <CurrentState className="fixed top-20 right-3 max-h-[50vh] overflow-auto w-1/5" />
+        </InformAIProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+`<CurrentState />` accepts a `className` so you can style.position it however you like (this example has it pinned top right). It will collapse/expand when you click the component heading if it's getting in the way.
+
+![CurrentState component](/docs/current-state-example.png)
+
+`<CurrentState />` is intended to help understand/debug in development, and is not something you'd likely ship to your users. Each time a component registers a state or event update, a row is added to CurrentState with the ability to dig down into a JSON view of all of the information.
+
+## Adding a Chatbot
+
+How you add your Chatbot UI is completely up to you. InformAI works well alongside the Vercel AI SDK (`npm install ai`), and provides a couple of rudimentary chatbot UI components out of the box that use Vercel AI SDK.
+
+Here's how you can use that to create your own simple `ChatBot` component using the Vercel AI SDK and InformAI:
+
+```tsx
+"use client";
+
+import { ChatWrapper } from "inform-ai";
+import { useActions, useUIState } from "ai/rsc";
+
+export function ChatBot() {
+  const { submitUserMessage } = useActions();
+  const [messages, setMessages] = useUIState();
+
+  return <ChatWrapper submitUserMessage={submitUserMessage} messages={messages} setMessages={setMessages} />;
+}
+```
+
+InformAI exposes `ChatBox` and `Messages` components, along with a `ChatWrapper` that just combines them both into an easy package. `ChatBox` is a fairly simple form with a text input and a button to submit the user's message, and `Messages` just renders the conversation between the user and the LLM assistant.
+
+Because the Vercel AI SDK is awesome, `Messages` can handle streaming LLM responses as well as streaming React Server Components (if you're using nextjs or similar). Here's an example of a conversation using `ChatWrapper`:
+
+![Example Chat on Schedules page](/docs/inform-ai-chat-example.png)
+
+You're highly encouraged to check out the [ChatWrapper source](/src/ui/ChatWrapper.tsx) as well as that for [ChatBox](/src/ui/ChatBox.tsx) and [Messages](/src/ui/Messages.tsx) - they're all pretty straightforward components so you can use all, some or none of them in your app.
+
+### Vercel AI backend for this example
+
+To get that `ChatBot` component to work, we actually need 2 more things:
+
+- A Vercel `<AIProvider>` in our React tree
+- A `submitUserMessage` function
+
+We can define those both in a single file, something like this:
 
 ```tsx
 "use server";
 
 import { CoreMessage, generateId } from "ai";
 import { createAI } from "ai/rsc";
-
-import { InformAIProvider } from "inform-ai";
-import { submitUserMessage } from "../actions/AI";
+import { AssistantMessage } from "inform-ai";
 
 export type ClientMessage = CoreMessage & {
   id: string;
@@ -64,6 +260,40 @@ export type UIState = {
   content: React.ReactNode;
 }[];
 
+export async function submitUserMessage(messages: ClientMessage[]) {
+  const aiState = getMutableAIState();
+
+  //add the new messages to the AI State so the user can refresh and not lose the context
+  aiState.update({
+    ...aiState.get(),
+    messages: [...aiState.get().messages, ...messages],
+  });
+
+  //set up our streaming LLM response using Vercel AI SDK
+  const result = await streamUI({
+    model: openai("gpt-4o-2024-08-06"),
+    system: "You are a helpful assistant who blah blah blah",
+    messages: aiState.get().messages,
+    text: ({ content, done }) => {
+      if (done) {
+        //save the LLM's response to our AIState
+        aiState.done({
+          ...aiState.get(),
+          messages: [...aiState.get().messages, { role: "assistant", content }],
+        });
+      }
+
+      //AssistantMessage is a simple, styled component that supports streaming text/UI responses
+      return <AssistantMessage content={content} />;
+    },
+  });
+
+  return {
+    id: generateId(),
+    content: result.value,
+  };
+}
+
 export const AIProvider = createAI<AIState, UIState>({
   actions: {
     submitUserMessage,
@@ -71,51 +301,15 @@ export const AIProvider = createAI<AIState, UIState>({
   initialUIState: [] as UIState,
   initialAIState: { chatId: generateId(), messages: [] } as AIState,
 });
-
-export default async function AIProviders({ children }: { children: React.ReactNode }) {
-  return (
-    <AIProvider>
-      <InformAIProvider>{children}</InformAIProvider>
-    </AIProvider>
-  );
-}
 ```
 
-Most of that was just setting up Vercel AI SDK and defining a couple of TypeScript types for the messages sent between the user and the LLM. As a convenience, we created and exported a React component called `<AIProviders>`, which just injects both the Vercel AI Provider and the InformAI Provider into your React component tree.
+This gives us our `submitUserMessage` and `<AIProvider>` exports. All you need to do now is add the `<AIProvider>` into your React component tree, just like we did with `<InformAIProvider>`, and everything should Just Work. The `useActions()` hook we used in our `ChatBot.tsx` will be able to pull out our `submitUserMessage` function and pass it to `ChatWrapper`, which will then call it when the user enters and sends a message.
 
-Inside your `layout.tsx`, we'll add that `<AIProviders>` component, along with the `<CurrentState />` component that is bundled with inform-ai. `<CurrentState />` is not intended to be used in production, but helps you keep track of what information you have surfaced to the LLM as you develop your code:
+The AIState management we do there is to keep a running context of the conversation so far - see the [Vercel AI SDK AIState docs](https://sdk.vercel.ai/examples/next-app/state-management/ai-ui-states) if you're not familiar with that pattern.
 
-```tsx
-import "inform-ai/dist/main.css";
-import "./globals.css";
+The `text` prop we passed to `streamUI` is doing 2 things - rendering a pretty `<AssistantMessage />` bubble for the streaming LLM response, and saving the finished LLM response into the AIState history when the LLM has finished its answer. This allows the LLM to see the whole conversation when the user sends follow-up messages, without the client needing to send the entire conversation each time.
 
-//the 2 Providers you just created
-import { AIProviders } from "./providers/AI";
-
-//optionally include the CurrentState component for easier InformAI debugging
-import { CurrentState } from "inform-ai";
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body>
-        <AIProviders>
-          {children}
-          <CurrentState className="fixed top-20 right-3 bottom-20 w-96" />
-        </AIProviders>
-      </body>
-    </html>
-  );
-}
-```
-
-### Exposing Component state and events
-
-Now that we have set up the Providers, exposing Component state to InformAI is easy:
+### Tips & Tricks
 
 #### Page-level integration
 
@@ -165,207 +359,39 @@ export default async function SchedulePage({ params: { id } }: { params: { id: s
 
 In this case we passed the `schedule` (a row from the database), `devices` (an array of device database rows) and `jobs` (an array of recent backup jobs) to the LLM, but we could have passed anything into `props`, so long as it is serializable into JSON. Next time the user sends the LLM a message, it will also receive all of the context we just exposed to it about this page, so can answer questions about what the user is looking at.
 
-#### Component-level integration
-
-When possible, it is usually better to use InformAI at the component level rather than the page level. Here's an example taken from the [backups table from lansaver](https://github.com/edspencer/lansaver/blob/main/components/backup/table.tsx), showing how to achieve this with the `useInformAI` hook:
-
-```tsx
-import { useInformAI } from "inform-ai";
-
-const prompt =
-  "This table displays a list of backups taken for various devices. The data will be provided to you in JSON format";
-
-export function BackupsTable({
-  name = "Backups Table",
-  backups,
-  showDevice = false,
-}: {
-  name?: string;
-  backups: BackupWithDevice[];
-  showDevice?: boolean;
-}) {
-  useInformAI({
-    name,
-    prompt,
-    props: {
-      backups,
-    },
-  });
-
-  if (condensed) {
-    return <CondensedBackupsTable backups={backups} showDevice={showDevice} />;
-  }
-
-  return (
-    <Table dense>
-      <TableHead>
-        <TableRow>
-          <TableHeader>ID</TableHeader>
-          {showDevice && <TableHeader>Device</TableHeader>}
-          <TableHeader>Status</TableHeader>
-          <TableHeader>Date</TableHeader>
-          <TableHeader>Size</TableHeader>
-          <TableHeader className="text-right">Actions</TableHeader>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {backups.map((backup) => (
-          <BackupRow key={backup.id} backup={backup} showDevice={showDevice} />
-        ))}
-      </TableBody>
-    </Table>
-  );
-}
-```
-
-Note that we could have used the `<InformAI ...>` React component again in this case instead of `useInformAI()`, but it was useful to use the hook in this case as we render a different table if `condensed` is set to true.
-
-#### Sending Component Events
-
-In addition to exposing Component state via `<InformAI>` and `useInformAI`, Components may expose events such as clicks and other user interactions.
-
-Here's an example of a different Table component, which can render arbitrary data and exposes `click` events when the user clicks on a table cell:
-
-```tsx
-const defaultPrompt = `This component is a table that displays data in a tabular format. 
-It takes two props: data and colHeaders. The data prop is an array of objects, where 
-each object represents a row in the table. The colHeaders prop is an optional 
-array of strings that represent the column headers of the table. 
-If the colHeaders prop is not provided, the component will use the 
-keys of the first object in the data array as the column headers. 
-The component will render the table with the provided data and column headers.`;
-
-export function Table({ data, colHeaders, name = "Table", informPrompt = defaultPrompt, header }: TableProps) {
-  const { addEvent, updateState } = useInformAI({
-    name,
-    prompt: informPrompt,
-    props: {
-      data,
-      colHeaders,
-    },
-  });
-
-  //adds a new hint to the AI
-  const cellClicked = (e: React.MouseEvent<HTMLTableCellElement>) => {
-    addEvent({
-      type: "user-click",
-      description: "User clicked on a cell with data: " + (e.target as HTMLElement).innerHTML,
-    });
-  };
-
-  return (
-    <div className="border border-yellow-500 flex-1">
-      {header}
-      <table className="min-w-full divide-y divide-gray-300">
-        <thead>
-          <tr>
-            {colHeaders
-              ? colHeaders.map((header, index) => <TableHeaderCell key={index}>{header.label}</TableHeaderCell>)
-              : Object.keys(data[0]).map((header, index) => <TableHeaderCell key={index}>{header}</TableHeaderCell>)}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {data.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {Object.values(row).map((cell, cellIndex) => (
-                <TableCell key={cellIndex} onClick={cellClicked}>
-                  {cell as ReactNode}
-                </TableCell>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-```
-
-The `type` and `description` we pass can be any strings we like, and will be exposed to the LLM next time we trigger it.
-
-### Processing messages from the user
-
-Now we just need an endpoint that will accept messages from our user, along with the `state` and `event` messages that our Components have created.
-
-Inside a file like `actions/AI.tsx`, we can define a `submitUserMessage` function like this (it doesn't have to be called `submitUserMessage`, just has to match whatever you passed into your AI Provider in the first step, and call from the UI in the next step):
-
-```tsx
-"use server";
-
-import { getMutableAIState, streamUI } from "ai/rsc";
-import { openai } from "@ai-sdk/openai";
-import { Spinner } from "@/components/common/spinner";
-
-import { AssistantMessage } from "inform-ai";
-import { generateId } from "ai";
-
-import { AIState, ClientMessage } from "../providers/AI";
-
-import RedirectTool from "../tools/Redirect";
-import BackupsTableTool from "../tools/BackupsTable";
-
-export async function submitUserMessage(messages: ClientMessage[]) {
-  const aiState = getMutableAIState();
-
-  //add the new messages to the AI State so the user can refresh and not lose the context
-  aiState.update({
-    ...aiState.get(),
-    messages: [...aiState.get().messages, ...messages],
-  });
-
-  //set up our streaming LLM response, with a couple of tools, a prompt and some onSegment logic
-  //to add any tools and text responses from the LLM to the AI State
-  const result = await streamUI({
-    model: openai("gpt-4o-2024-08-06"),
-    initial: <Spinner />,
-    system: `\
-    You are a helpful assistant who can blah blah blah - 
-    give your LLM detailed instructions about your app here`,
-    messages: [
-      ...aiState.get().messages.map((message: any) => ({
-        role: message.role,
-        content: message.content,
-        name: message.name,
-      })),
-    ],
-    text: ({ content, done }) => {
-      if (done) {
-        //store the LLM's response into AIState
-        aiState.update({
-          ...aiState.get(),
-          messages: [...aiState.get().messages, { role: "assistant", content }],
-        });
-
-        // console.log(aiState.get().messages); //if you want to see the message history
-        aiState.done(aiState.get());
-      }
-
-      return <AssistantMessage content={content} />;
-    },
-    tools: {
-      redirect: RedirectTool,
-      backupsTable: BackupsTableTool,
-    },
-  });
-
-  return {
-    id: generateId(),
-    content: result.value,
-  };
-}
-```
-
-Here we're using the Vercel AI SDK's `streamUI` function, which allows us to easily send back streaming text like a basic chatbot, but also streaming UI in the shape of our React Server Components.
-
-All of the InformAI messages along with whatever the user wants to ask for will be passed in via the `messages` argument to this function. We'll see how that happens in the final section below.
+When possible, it is usually better to use InformAI at the component level rather than the page level to take advantage of React's composability, but it's really up to you.
 
 #### Streaming UI using Tools
 
-In the code snippet above we defined 2 tools that the LLM can execute if it thinks it makes sense to do so. If the tool has a `generate` function, it can render arbitrary React components that will be streamed to the browser.
+We can extend our use of streamUI and other functions like it by providing tools definitions for the LLM to choose from. The streamUI() function and its UI streaming capabilities are 100% Vercel AI SDK functionality and not InformAI itself, but InformAI plays well with it and supports streaming UI instead of/in addition to streaming text responses from the LLM:
 
-Here's a real-world example of a tool definition used in the [LANsaver](https://github.com/edspencer/lansaver) project ([see the full tool source](https://github.com/edspencer/lansaver/blob/main/app/tools/BackupsTable.tsx)). Most of this file is just textual description telling the LLM what the tool is and how to use it.
+```tsx
+//inside our submitUserMessage function
+const result = await streamUI({
+  model: openai("gpt-4o-2024-08-06"),
+  system: "You are a helpful assistant who blah blah blah",
+  messages: aiState.get().messages,
+  text: ({ content, done }) => {
+    if (done) {
+      //save the LLM's response to our AIState
+      aiState.done({
+        ...aiState.get(),
+        messages: [...aiState.get().messages, { role: "assistant", content }],
+      });
+    }
 
-The important part of the tool is the `generate` function. Note that this is all just vanilla Vercel AI SDK functionality, and you can read more about it [in their docs](https://sdk.vercel.ai/examples/next-app/interface/route-components). Basically, though, this function `yield`s a Spinner component while it is loading the data for the real component it will show, then does some basic fuzzy searching, then finally returns the `<BackupsTable>` component, which will be streamed to the UI:
+    return <AssistantMessage content={content} />;
+  },
+  tools: {
+    redirect: RedirectTool,
+    backupsTable: BackupsTableTool,
+  },
+});
+```
+
+In the code snippet above we defined 2 tools that the LLM can execute if it thinks it makes sense to do so. If the tool has a `generate` function, it can render arbitrary React components that will be streamed to the browser. Tools can be defined inline but they're easier to read, test and swap in/out when extracted into their own files (tool-calling LLMs like those from OpenAI are still not great at picking the right tool when given too many options).
+
+Here's a real-world example of a tool definition used in the [LANsaver](https://github.com/edspencer/lansaver) project ([see the full tool source](https://github.com/edspencer/lansaver/blob/main/app/tools/BackupsTable.tsx)). Most of this file is just textual description telling the LLM what the tool is and how to use it. The important part of the tool is the `generate` function:
 
 ```tsx
 import { z } from "zod";
@@ -440,107 +466,9 @@ const BackupsTableTool = {
 export default BackupsTableTool;
 ```
 
-### Sending message from the UI to the LLM
+Note that this is all just vanilla Vercel AI SDK functionality, and you can read more about it [in their docs](https://sdk.vercel.ai/examples/next-app/interface/route-components). Basically, though, this function `yield`s a Spinner component while it is loading the data for the real component it will show, then does some basic fuzzy searching, then finally returns the `<BackupsTable>` component, which will be streamed to the UI.
 
-The final piece of the puzzle is some piece of UI that allows the user to send messages to the LLM. InformAI comes bundled with a couple of simple UI components out of the box to make this a little faster, but you don't have to use them.
-
-Here's one way you might do that, with a React component called `ChatWrapper`. This pulls in the `Messages`, `UserMessage` and `ChatBox` React components from InformAI, which are super simple components that just either render messages or allow the user to send a new one.
-
-The meat of this `ChatWrapper` is the `onMessage` function, which does a few things:
-
-- Calls `popRecentMessages()` to pull all of the latest component-sent `state` and `event` messages out of `inform-ai`
-- Dedupes these messages (multiple React renders will cause repeated `state` messages)
-- Runs the messages through `mapComponentMessages`, which just turns the message objects into an LLM-friendly string (you can swap this out for your own implementation)
-- Creates a new message object with the text the user just entered
-- Adds the LLM-friendly InformAI messages plus the new user message to the message history
-- Sends the new messages to our `submitUserMessage` function
-- Once the LLM response is received, add it to the messages array so that the InformAI `<Messages>` component will render it
-- Returns true to tell `<ChatBox>` to clear the input
-
-A future version of InformAI may provide a `<ChatWrapper>` component out of the box so that you don't have to copy/paste this into your project, but it is likely that much of what the `onMessage` handler does will be at least somewhat specific to your application. This also gives you the option to provide your own `mapComponentMessages`, `dedupeMessages` and other functions if desired:
-
-```tsx
-"use client";
-
-import type { AIProvider } from "@/app/providers/AI";
-
-import { useActions, useUIState } from "ai/rsc";
-import { generateId } from "ai";
-import clsx from "clsx";
-
-import { Messages, UserMessage, ChatBox, useInformAIContext, dedupeMessages, mapComponentMessages } from "inform-ai";
-
-export function ChatWrapper({ className }: { className?: string }) {
-  const { submitUserMessage } = useActions();
-  const { popRecentMessages } = useInformAIContext();
-  const [messages, setMessages] = useUIState<typeof AIProvider>();
-
-  async function onMessage(message: string) {
-    const componentMessages = popRecentMessages();
-
-    //deduped set of component-generated messages like state updates and events, since the last user message
-    const newSystemMessages = mapComponentMessages(dedupeMessages(componentMessages));
-
-    //this is the new user message that will be sent to the AI
-    const newUserMessage = { id: generateId(), content: message, role: "user" };
-
-    //the new user message UI that will be added to the chat history
-    const newUserMessageUI = { ...newUserMessage, content: <UserMessage message={message} /> };
-    setMessages([...messages, ...newSystemMessages, newUserMessageUI]);
-
-    //send the new user message to the AI, along with the all the recent messages from components
-    const responseMessage = await submitUserMessage([...newSystemMessages, newUserMessage]);
-
-    //update the UI with whatever the AI responded with
-    setMessages((currentMessages) => [...currentMessages, { ...responseMessage, role: "assistant" }]);
-
-    //return true to clear the chat box
-    return true;
-  }
-
-  return (
-    <div className={clsx("flex flex-col border border-slate-200 rounded-md p-1 bg-white gap-1", className)}>
-      <Messages messages={messages} />
-      <ChatBox onSubmit={onMessage} />
-    </div>
-  );
-}
-```
-
-Drop this into your layout.tsx like so (here we're just using Tailwind to pin it to the bottom right corner):
-
-```tsx
-import "inform-ai/dist/main.css";
-import "./globals.css";
-
-//the 2 Providers you just created
-import { AIProviders } from "./providers/AI";
-
-//optionally include the CurrentState component for easier InformAI debugging
-import { CurrentState } from "inform-ai";
-
-import { ChatWrapper } from "@/components/ChatWrapper";
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body>
-        <AIProviders>
-          {children}
-          <CurrentState className="fixed top-20 right-3 bottom-20 w-96" />
-          <ChatWrapper className="fixed bottom-10 right-3 max-h-1/3 w-1/4" />
-        </AIProviders>
-      </body>
-    </html>
-  );
-}
-```
-
-And you're done. You should now see the `<CurrentState>` component rendering at the top right of the screen, showing all of the `state` and `event` messages your components have exposed to InformAI, and a simple chat box with message history at the bottom right. When you next send a message to the LLM via the chat input, all of the InformAI messages that have not previously been sent will be, along with your message, giving the LLM all the context you gave it to answer your question.
+The [Render Interface During Tool Call](https://sdk.vercel.ai/examples/next-app/tools/render-interface-during-tool-call) documentation in the Vercel AI SDK is a good thing to read if you're not familiar with what that can do already.
 
 ### What the LLM sees
 
@@ -554,11 +482,11 @@ Because `<BackupsTable>` also uses InformAI, via the `useInformAI` hook, the LLM
 
 As our project was using the bundled `<CurrentState>` component while we had this conversation, we could easily see what the state sent to the LLM looks like directly in our UI:
 
-![CurrentState after this exchange](/docs/current-state-example.png)
+![CurrentState after this exchange](/docs/current-state-example-2.png)
 
 Here you can see that 4 `state` messages were published to InformAI - the first 2 were for the `SchedulePage` (which has name=`Schedule Detail Page`), and 2 for the freshly-streamed `<BackupsTable>` that the LLM sent back. Expanding the last message there, we can see that the LLM gave the streamed component a sensible name based on the user's request, and also has the `prompt` and `props` that we supply it in `<BackupsTable>`.
 
-The 'Last Sent' message at the bottom tells us that all of the messages above were already sent to the LLM, as they were popped off the stack using `popRecentMessages` in our `<ChatWrapper>` component. `ChatWrapper` also did some deduping and conversion of the messages into an LLM-friendly format (see the [Sending Messages to the LLM](#sending-message-from-the-ui-to-the-llm) section), so now if we modify our `actions/AI.tsx` file and `console.log(aiState.get().messages)` we will see this:
+The 'Last Sent' message at the bottom tells us that all of the messages above were already sent to the LLM, as they were popped off the stack using `popRecentMessages` in our `<ChatWrapper>` component. `ChatWrapper` also did some deduping and conversion of the messages into an LLM-friendly format. If we add `console.log(aiState.get().messages)` to our `submitUserMessage` function we will see something like this:
 
 ```
 [

@@ -25,7 +25,7 @@
     "url": "git+https://github.com/edspencer/inform-ai.git"
   },
   "author": "Ed Spencer",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.27.7",
     "@jest/globals": "^29.7.0",

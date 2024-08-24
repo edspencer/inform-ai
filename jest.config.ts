@@ -1,12 +1,8 @@
-// jest.config.ts
 import type { JestConfigWithTsJest } from "ts-jest";
 
 const jestConfig: JestConfigWithTsJest = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
-  transform: {
-    // "^.+\\.(t|j)sx?$": ["@swc/jest"],
-  },
   moduleNameMapper: {
     "^ai/rsc$": "<rootDir>/node_modules/ai/rsc/dist",
     "^@/(.*)$": "<rootDir>/$1",
