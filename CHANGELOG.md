@@ -1,5 +1,15 @@
 # inform-ai
 
+## 0.4.0
+
+### Minor Changes
+
+- b7c17d0: Adopt MIT license
+
+### Patch Changes
+
+- b7c17d0: Better README
+
 ## 0.3.2
 
 ### Patch Changes
