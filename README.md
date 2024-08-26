@@ -10,6 +10,10 @@
 
 InformAI doesn't directly send data to your LLM but simplifies integration with tools like the Vercel AI SDK, making it easy to incorporate AI into your app.
 
+If ChatGPT and other LLMs can read and write text, and Vercel AI SDK adds the ability to write UI by streaming React components as part of an LLM response, InformAI fills in the missing piece by allowing the LLM to read your UI as well as write to it:
+
+![Where InformAI fits](/docs/magic-square.png)
+
 ## Installation
 
 Install the NPM package:
@@ -159,8 +163,6 @@ export function Table({ data, colHeaders, name = "Table", informPrompt = default
 ```
 
 The `type` and `description` we pass can be any strings we like.
-
-`useInformAI`
 
 ## Viewing Current State
 
@@ -492,7 +494,7 @@ The 'Last Sent' message at the bottom tells us that all of the messages above we
 [
   {
     id: '492b4wc',
-    content: 'Component adc51d8c-8ada-464a-a924-3f2ddb604b16 has updated its state\n' +
+    content: 'Component adc51d has updated its state\n' +
       'Component Name: Schedule Detail Page\n' +
       "Component self-description: A page that shows the details of a schedule. It should show the schedule's configuration, the devices in the schedule, and recent jobs for the schedule. It should also have buttons to run the schedule, edit the schedule, and delete the schedule.\n" +
       'Component props: {"schedule":{"id":6,"disabled":false,"cron":"0 0 * * *","name":"Daily","devices":"21,19,83","createdAt":"2024-06-14T19:55:29.825Z","updatedAt":"2024-08-13T21:17:43.936Z"},"devices":[{"id":21,"type":"tplink","hostname":"masterclosetswitch.local","credentials":"fdbec89f1c1bb41b0e55d60f46092da3:7391a495c95411ebc5f087c4b8f5bcfb2b903d370cedd6a819a9e69b15f03999b9fbc4378a5254751ddb038bfec87facd5b642d0aa28b48b9ecf675b0deceb28","config":"{}","createdAt":"2024-06-14T19:55:29.824Z","updatedAt":"2024-06-14T19:55:29.824Z"},{"id":19,"type":"opnsense","hostname":"firewall.local","credentials":"dd503eaafa2acdae999023a63735b7b8:9af028d461a8b3aea27c6edc013d64e98d33476d8614bdd0ad1cab42601a2517c01cc0342b6946fee8bb5a31ceaa26a659b37051da1584ba163360f9465997154ff7f9344ff5726683fe6183e6e7054f622aeeaaa2402dc416e5ae6edea6cb34ff9d80720bb9942d2ccb90015821f8fa103ec0f116bcc3532b2ff285dad80ec56c90503996b094daf52b5775b224b137a8ba0dc13d29e2e4c37d244ff10bda30bc7ed892390efc3e3ac19dd0845e7cb0e6b3cd88c2f126d2f8d9b7191f85f72f","config":"{}","createdAt":"2024-06-14T19:55:29.823Z","updatedAt":"2024-06-16T16:06:39.091Z"},{"id":83,"type":"hass","hostname":"13232pct.duckdns.org","credentials":"6628e50a7bd550741dd1963ef98bfb67:107376648f66355e19787eb82036ea506a9cae6152ed98f1f1739640d2a930f30c54683c9bc3eaebd49043434afeed16b7928ba31b44048477b40d68f2a1638d83a9e1aaf83f015ffc53ed5114eb77fd90e06cfe3f52f804d9433056b985a0f00358e42d04733440e7c3c245a926266e3f5d1232022850baa970e38d8a33b032e1ccdadc563574420447cacb8498dbb637dfdfa19272cf226df112730cd8e4282e09ce99c30e0854c7ca5144426ad8f7f349fcffea7da3f7970c3ad5af9b33023ad7f057ad4144817f9df0e4c69e1466","config":"{\\"port\\":\\"3000\\"}","createdAt":"2024-07-16T17:13:33.455Z","updatedAt":"2024-07-16T17:13:33.455Z"}],"jobs":[{"id":24,"createdAt":"2024-08-13T21:17:54.387Z","updatedAt":"2024-08-13T21:18:31.499Z","startedAt":"2024-08-13T21:17:54.400Z","finishedAt":"2024-08-13T21:18:31.496Z","status":"completed","scheduleId":6,"_count":{"backups":3}},{"id":23,"createdAt":"2024-08-13T21:15:46.991Z","updatedAt":"2024-08-13T21:15:47.571Z","startedAt":"2024-08-13T21:15:47.004Z","finishedAt":"2024-08-13T21:15:47.570Z","status":"completed","scheduleId":6,"_count":{"backups":2}},{"id":22,"createdAt":"2024-08-13T21:09:42.083Z","updatedAt":"2024-08-13T21:09:42.083Z","startedAt":null,"finishedAt":null,"status":"pending","scheduleId":6,"_count":{"backups":1}},{"id":18,"createdAt":"2024-07-15T15:37:38.955Z","updatedAt":"2024-07-15T15:38:14.366Z","startedAt":"2024-07-15T15:37:38.967Z","finishedAt":"2024-07-15T15:38:14.365Z","status":"completed","scheduleId":6,"_count":{"backups":2}},{"id":17,"createdAt":"2024-07-15T15:36:30.814Z","updatedAt":"2024-07-15T15:37:06.483Z","startedAt":"2024-07-15T15:36:30.828Z","finishedAt":"2024-07-15T15:37:06.482Z","status":"completed","scheduleId":6,"_count":{"backups":2}}]}',
@@ -506,7 +508,7 @@ The 'Last Sent' message at the bottom tells us that all of the messages above we
   { role: 'assistant', content: 'This schedule backs up 3 devices.' },
   {
     id: '3Rytlyw',
-    content: 'Component 7df18442-843c-4fc8-a1cf-a5eaa5a9ba9a has updated its state\n' +
+    content: 'Component 2b5e1c has updated its state\n' +
       'Component Name: 3 Most Recent Backups for firewall.local\n' +
       'Component self-description: This table displays a list of backups taken for various devices. The data will be provided to you in JSON format\n' +
       'Component props: {"backups":[{"id":65,"jobId":24,"deviceId":19,"createdAt":"2024-08-13T21:17:54.391Z","updatedAt":"2024-08-13T21:17:54.626Z","status":"completed","bytes":57117},{"id":63,"jobId":23,"deviceId":19,"createdAt":"2024-08-13T21:15:46.996Z","updatedAt":"2024-08-13T21:15:47.571Z","status":"completed","bytes":57117},{"id":61,"jobId":22,"deviceId":19,"createdAt":"2024-08-13T21:09:42.091Z","updatedAt":"2024-08-13T21:09:42.091Z","status":"pending","bytes":null}]}',
@@ -530,7 +532,7 @@ The 'Last Sent' message at the bottom tells us that all of the messages above we
 
 It's a little dense to the human eye, but here we can see the first message is from the `system` role, and is a string representation of the content that we supplied to `<InformAI>` in our `SchedulePage` React component. After that we see our user message, followed by another `system` message that InformAI injected for us because the `<BackupsTable>` was streamed in as a response and published data to InformAI.
 
-The internal messages stored by InformAI are converted into LLM-friendly strings via the [mapComponentMessages](https://github.com/edspencer/inform-ai/blob/main/src/utils.ts) function, but it's easy to swap that out for any function you like. The default `mapComponentMessages` function just delegates to a function that looks like this:
+The internal messages stored by InformAI are converted into LLM-friendly strings via the [mapComponentMessages](https://github.com/edspencer/inform-ai/blob/main/src/utils.tsx) function, but it's easy to swap that out for any function you like. The default `mapComponentMessages` function just delegates to a function that looks like this:
 
 ```tsx
 export function mapStateToContent(state: StateMessage) {
