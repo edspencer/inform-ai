@@ -10,10 +10,12 @@
 export function ChatBox({
   autoFocus = false,
   placeholder = "Ask me anything...",
+  sendButtonText = "Send",
   onSubmit,
 }: {
   autoFocus?: boolean;
   placeholder?: string | null;
+  sendButtonText?: string;
   onSubmit: (message: string) => Promise<boolean>;
 }) {
   return (
@@ -51,7 +53,7 @@ export function ChatBox({
         />
       </div>
       <button type="submit" className="chatbox-button">
-        Send
+        {sendButtonText}
       </button>
     </form>
   );

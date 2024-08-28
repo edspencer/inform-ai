@@ -12,6 +12,8 @@ export interface ChatWrapperProps {
   submitUserMessage: (messages: any[]) => Promise<any>;
   messages?: any[];
   setMessages: (value: any[] | ((prevState: any[]) => any[])) => void;
+  placeholder?: string;
+  sendButtonText?: string;
 }
 
 /**
@@ -80,7 +82,14 @@ export interface ChatWrapperProps {
  * @param {function} props.setMessages - A function to update the messages in the chat history. Can be async.
  * @return {JSX.Element} The JSX element representing the chat wrapper.
  */
-export function ChatWrapper({ className, submitUserMessage, messages = [], setMessages }: ChatWrapperProps) {
+export function ChatWrapper({
+  className,
+  submitUserMessage,
+  messages = [],
+  setMessages,
+  placeholder,
+  sendButtonText,
+}: ChatWrapperProps) {
   const { popRecentMessages } = useInformAIContext();
 
   async function onMessage(message: string) {
@@ -109,7 +118,7 @@ export function ChatWrapper({ className, submitUserMessage, messages = [], setMe
   return (
     <div className={clsx("flex flex-col p-1", className)}>
       <Messages messages={messages} />
-      <ChatBox onSubmit={onMessage} />
+      <ChatBox onSubmit={onMessage} placeholder={placeholder} sendButtonText={sendButtonText} />
     </div>
   );
 }
