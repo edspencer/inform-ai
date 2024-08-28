@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.5.0
+
+### Minor Changes
+
+- 8b87064: Allow customization of placeholder and send button text
+
 ## 0.4.1
 
 ### Patch Changes
