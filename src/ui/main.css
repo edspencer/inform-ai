@@ -25,7 +25,7 @@
 /* Messages styles */
 @layer components {
   .iai-messages {
-    @apply flex flex-col gap-2;
+    @apply flex flex-col gap-2 overflow-y-auto;
 
     .user-message {
       @apply flex justify-end;
