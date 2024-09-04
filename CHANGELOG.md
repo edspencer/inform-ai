@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.5.1
+
+### Patch Changes
+
+- bc1e6e9: Fix scrolling overflow on Messages UI component
+
 ## 0.5.0
 
 ### Minor Changes
