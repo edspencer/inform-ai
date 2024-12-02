@@ -7,12 +7,13 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "outDir": "dist",
+    "rootDir": "src",
     "declaration": true,
     "declarationDir": "./dist/types",
     "moduleResolution": "node",
-    "jsx": "react-jsx" // Use the new JSX transform
+    "jsx": "react-jsx",
+    "sourceMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -2,9 +2,14 @@
   "name": "inform-ai",
   "version": "0.5.1",
   "description": "A collection of hooks and utilities to easily add contextual AI to React applications",
-  "main": "dist/index.js",
-  "directories": {
-    "example": "example"
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js"
+    }
   },
   "scripts": {
     "test": "npx jest",
@@ -18,7 +23,7 @@
     "react"
   ],
   "files": [
-    "/dist"
+    "/dist/**/*"
   ],
   "repository": {
     "type": "git",
