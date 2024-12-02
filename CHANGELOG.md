@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.5.2
+
+### Patch Changes
+
+- 1014721: Fixed CJS output
+
 ## 0.5.1
 
 ### Patch Changes
