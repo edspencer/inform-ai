@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.5.3
+
+### Patch Changes
+
+- 35fac59: Fixed Vercel AI SDK version
+
 ## 0.5.2
 
 ### Patch Changes
