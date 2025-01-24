@@ -14,6 +14,7 @@ export default [
       }),
     ],
   },
+  // ESM Build
   {
     input: "src/index.ts",
     output: {
