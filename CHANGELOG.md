@@ -1,5 +1,11 @@
 # inform-ai
 
+## 0.5.4
+
+### Patch Changes
+
+- 57f065e: Fix AI SDK dep again
+
 ## 0.5.3
 
 ### Patch Changes
